@@ -1,0 +1,44 @@
+# Use the provided runtime version to fetch base image
+# https://gallery.ecr.aws/docker/library/node
+ARG NODE_VERSION
+FROM public.ecr.aws/docker/library/node:${NODE_VERSION}-alpine
+
+# Add repos 
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories && \
+    echo "http://dl-cdn.alpinelinux.org/alpine/edge/community/" >> /etc/apk/repositories && \
+    apk update
+
+# Install deps
+RUN apk add --no-cache \
+    bash \
+    curl \
+    git \
+    zip \
+    python3 \
+    ca-certificates 
+
+# Install Yarn and PNPM (via corepack, included with Node)
+RUN corepack enable && \
+    corepack prepare yarn@stable --activate && \
+    corepack prepare pnpm@latest --activate
+
+# Set default shell
+ENV SHELL=/bin/bash
+
+# Install Bun
+RUN curl -fsSL https://bun.sh/install | bash
+
+# Update PATH for bun
+ENV PATH="/root/.bun/bin:$PATH"
+
+# Verify everything works
+RUN node --version && \
+    npm --version && \
+    pnpm --version && \
+    yarn --version && \
+    bun --version
+
+RUN rm -rf /var/cache/apk/*
+
+# Default command
+CMD ["bash", "-c"]

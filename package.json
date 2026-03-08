@@ -1,0 +1,70 @@
+{
+  "name": "@thunder-so/thunder",
+  "version": "1.0.0",
+  "description": "Unified CDK library for deploying web applications on AWS",
+  "keywords": [
+    "aws",
+    "cdk",
+    "spa",
+    "ssg",
+    "lambda",
+    "ecs",
+    "fargate",
+    "nuxt",
+    "astro",
+    "serverless",
+    "container",
+    "typescript",
+    "infrastructure-as-code"
+  ],
+  "type": "module",
+  "main": "index.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thunder-so/thunder.git"
+  },
+  "author": {
+    "name": "CloudBits, Inc.",
+    "url": "https://www.thunder.so",
+    "organization": true
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "cdk": "cdk",
+    "build": "tsc -b .",
+    "clean": "tsc -b --clean",
+    "watch": "tsc -b -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "th": "cli/th.mjs",
+    "th-init": "cli/th-init.mjs",
+    "th-deploy": "cli/th-deploy.mjs",
+    "th-destroy": "cli/th-destroy.mjs"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "24.9.1",
+    "@types/shelljs": "^0.8.15",
+    "aws-cdk": "2.1023.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
+    "typescript": "~5.9.3"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.221.0",
+    "chalk": "^5.4.0",
+    "commander": "^13.0.0",
+    "constructs": "^10.4.2",
+    "fs-extra": "^11.3.2",
+    "inquirer": "^12.3.0",
+    "ora": "^8.2.0",
+    "shelljs": "^0.10.0",
+    "source-map-support": "^0.5.21",
+    "yaml": "^2.8.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}
