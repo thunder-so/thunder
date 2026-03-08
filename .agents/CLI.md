@@ -7,7 +7,6 @@ The Thunder CLI (`th`) is the primary interface for developing, deploying, and m
 1.  **Context-Awareness:** [x] **DONE**: The CLI automatically detects the current environment, application, and service from the repository structure or configuration, minimizing repetitive flag usage.
 2.  **Zero-Config Defaults:** [x] **DONE**: "It just works" out of the box with sensible defaults for AWS regions, accounts, and resource sizing.
 3.  **Local Dev Parity:** [ ] **TODO**: Enables a local development loop that closely mirrors production, including live Lambda iteration (future scope) and local emulation of static sites.
-4.  **SST-Style Metadata:** [x] **DONE**: Uses the `thunder-discovery` S3 bucket to store and retrieve deployment state, enabling a potential future Console UI.
 
 ## Command Reference
 
@@ -40,19 +39,6 @@ The Thunder CLI (`th`) is the primary interface for developing, deploying, and m
     -   **Safety Checks:** Prompts for confirmation, especially for `prod` stages or stateful resources (RDS, S3).
     -   **Metadata Cleanup:** Removes entries from the `thunder-discovery` bucket.
 
-### `th secrets`
-- [ ] **TODO**: Manages secrets and configuration.
-
--   **Usage:** 
-    -   `th secrets set <key> <value> [--stage <stage>]`
-    -   `th secrets get <key> [--stage <stage>]`
-    -   `th secrets list [--stage <stage>]`
--   **Features:**
-    -   **SSM/Secrets Manager:** Abstraction over AWS Parameter Store (standard config) and Secrets Manager (sensitive data).
-    -   **Encryption:** Ensures values are encrypted at rest.
-    -   **Local Sync:** `th dev` automatically pulls these values.
-
-
 ## Implementation Details
 
 ### Context Resolution (`bin/*.ts`)
@@ -61,27 +47,6 @@ The Thunder CLI (`th`) is the primary interface for developing, deploying, and m
 -   It executes these scripts using `ts-node` or `tsx`.
 -   The scripts instantiate the Stacks (e.g., `NuxtStack`, `FargateStack`).
 -   The CLI injects context (app, env, service, account, region) via environment variables or context context keys.
-
-### Metadata & Discovery
-- [x] **DONE**: We mirror SST's state discovery mechanism:
--   **Bucket:** `thunder-discovery-<account>-<region>`
--   **Key Structure:** `apps/<app>/<stage>/<service>/metadata.json`
--   **Content:**
-    ```json
-    {
-      "id": "myapp-dev-nuxt",
-      "type": "Nuxt",
-      "region": "us-east-1",
-      "outputs": {
-        "DistributionId": "E1234567890",
-        "DistributionUrl": "https://d123.cloudfront.net",
-        "Route53Domain": "https://api.myapp.com"
-      },
-      "resources": {
-        "LambdaFunction": "myapp-dev-nuxt-function"
-      }
-    }
-    ```
 
 ### CLI Architecture
 - [ ] **TODO**:

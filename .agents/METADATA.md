@@ -46,6 +46,15 @@ The `metadata.json` file contains a standardized set of properties that align wi
 - [x] **DONE**: **`DiscoveryConstruct`**: A shared construct located in `lib/constructs/discovery.ts`.
 - [x] **DONE**: **`BucketDeployment`**: Uses `aws-s3-deployment` to upload `Source.jsonData` during the CDK deployment phase.
 - [x] **DONE**: **Standardization**: Metadata field names are strictly aligned with `CfnOutput` logical IDs (e.g., `DistributionId`, `ServiceUrl`).
+- [x] **DONE**: Each deployment stores its metadata in a centralized S3 bucket (`thunder-discovery-<account>-<region>`). 
+
+Metadata includes:
+- [x] App identity (application, service, environment)
+- [x] Resource ARNs, IDs and URLs (Aligned with `CfnOutput` names)
+- [x] Deployment timestamps
+- [x] Framework-specific metadata
+- [x] Route53 domain integration
+
 
 ## ISSUES:
 
