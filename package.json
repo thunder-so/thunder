@@ -1,7 +1,7 @@
 {
   "name": "@thunder-so/thunder",
   "version": "1.0.0",
-  "description": "Unified CDK library for deploying web applications on AWS",
+  "description": "CDK library for deploying web applications on AWS",
   "keywords": [
     "aws",
     "cdk",
@@ -64,7 +64,6 @@
     "yaml": "^2.8.1"
   },
   "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://npm.pkg.github.com"
   }
 }
