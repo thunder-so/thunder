@@ -1,5 +1,5 @@
 import { App } from "aws-cdk-lib";
-import { AstroStack, type NuxtProps as AstroProps } from '../';
+import { Astro, type NuxtProps as AstroProps } from '../';
 import { Runtime, Architecture } from 'aws-cdk-lib/aws-lambda';
 
 const app = new App();
@@ -45,6 +45,6 @@ const metadata: AstroProps = {
   }
 };
 
-new AstroStack(app, `${metadata.application}-${metadata.service}-${metadata.environment}-stack`, metadata);
+new Astro(app, `${metadata.application}-${metadata.service}-${metadata.environment}-stack`, metadata);
 
 app.synth();

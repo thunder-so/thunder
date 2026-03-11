@@ -1,5 +1,5 @@
 import { App } from "aws-cdk-lib";
-import { FargateStack, type FargateProps } from '../';
+import { Fargate, type FargateProps } from '../';
 import { CpuArchitecture } from 'aws-cdk-lib/aws-ecs';
 
 const app = new App();
@@ -30,6 +30,6 @@ const metadata: FargateProps = {
   }
 };
 
-new FargateStack(app, `${metadata.application}-${metadata.service}-${metadata.environment}-stack`, metadata);
+new Fargate(app, `${metadata.application}-${metadata.service}-${metadata.environment}-stack`, metadata);
 
 app.synth();

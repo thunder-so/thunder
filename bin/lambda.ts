@@ -1,5 +1,5 @@
 import { App } from "aws-cdk-lib";
-import { LambdaStack, type LambdaProps } from '../';
+import { Lambda, type LambdaProps } from '../';
 import { Runtime, Architecture } from 'aws-cdk-lib/aws-lambda';
 
 const app = new App();
@@ -45,6 +45,6 @@ const metadata: LambdaProps = {
   }
 };
 
-new LambdaStack(app, `${metadata.application}-${metadata.service}-${metadata.environment}-stack`, metadata);
+new Lambda(app, `${metadata.application}-${metadata.service}-${metadata.environment}-stack`, metadata);
 
 app.synth();

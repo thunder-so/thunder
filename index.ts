@@ -17,5 +17,9 @@ export type { TemplateProps } from './types/TemplateProps';
 export type { NuxtProps } from './types/NuxtProps';
 export type { NuxtProps as AstroProps } from './types/NuxtProps';
 
+// Template utilities
+export { fetchTemplate } from './lib/template/template/fetch';
+export { hydrateTemplate } from './lib/template/template/hydrate';
+
 // Re-export everything from aws-cdk-lib
 export * as Cdk from 'aws-cdk-lib';

@@ -1,5 +1,5 @@
 import { App } from "aws-cdk-lib";
-import { NuxtStack, type NuxtProps } from '../';
+import { Nuxt, type NuxtProps } from '../';
 import { Runtime, Architecture } from 'aws-cdk-lib/aws-lambda';
 
 const app = new App();
@@ -45,6 +45,6 @@ const metadata: NuxtProps = {
   }
 };
 
-new NuxtStack(app, `${metadata.application}-${metadata.service}-${metadata.environment}-stack`, metadata);
+new Nuxt(app, `${metadata.application}-${metadata.service}-${metadata.environment}-stack`, metadata);
 
 app.synth();

@@ -1,5 +1,5 @@
 import { App } from "aws-cdk-lib";
-import { Ec2Stack, type Ec2Props } from '../';
+import { Ec2, type Ec2Props } from '../';
 import { CpuArchitecture } from 'aws-cdk-lib/aws-ecs';
 
 const app = new App();
@@ -30,6 +30,6 @@ const metadata: Ec2Props = {
 };
 
 const name = `${metadata.application}-${metadata.service}-${metadata.environment}-stack`;
-new Ec2Stack(app, name, metadata);
+new Ec2(app, name, metadata);
 
 app.synth();

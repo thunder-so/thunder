@@ -1,6 +1,6 @@
 import { App } from "aws-cdk-lib";
 import { InstanceType } from "aws-cdk-lib/aws-ec2";
-import { TemplateStack, type TemplateProps, fetchTemplate, hydrateTemplate } from '../';
+import { Template, type TemplateProps, fetchTemplate, hydrateTemplate } from '../';
 
 const app = new App();
 
@@ -46,7 +46,7 @@ async function main() {
     hydrateResult,
   };
 
-  new TemplateStack(app, `${config.application}-${config.service}-${config.environment}-stack`, metadata);
+  new Template(app, `${config.application}-${config.service}-${config.environment}-stack`, metadata);
 
   app.synth();
 }

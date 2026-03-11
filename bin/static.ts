@@ -1,5 +1,5 @@
 import { App } from "aws-cdk-lib";
-import { StaticStack, type StaticProps } from '../';
+import { Static, type StaticProps } from '../';
 
 const app = new App();
 
@@ -9,6 +9,6 @@ if (!metadata) {
   throw new Error('Context metadata missing!');
 }
 
-new StaticStack(app, `${metadata.application}-${metadata.service}-${metadata.environment}-stack`, metadata);
+new Static(app, `${metadata.application}-${metadata.service}-${metadata.environment}-stack`, metadata);
 
 app.synth();

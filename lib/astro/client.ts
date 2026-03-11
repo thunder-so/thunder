@@ -290,13 +290,7 @@ export class ClientConstruct extends Construct {
         originOverride: true,
       },
       customHeadersBehavior: {
-        customHeaders: props.headers
-        ? Object.entries(props.headers).map(([key, value]) => ({
-          header: key,
-          value: value,
-          override: true,
-        }))
-        : [],
+        customHeaders: [],
       },
       removeHeaders: ['server', 'age' , 'date'],
     });
