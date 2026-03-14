@@ -13,6 +13,7 @@ import { IDistribution } from 'aws-cdk-lib/aws-cloudfront';
 import { DockerImageAsset } from 'aws-cdk-lib/aws-ecr-assets';
 import { StaticProps } from '../../types/StaticProps';
 import { getResourceIdPrefix } from '../utils';
+import { EventsConstruct } from '../constructs/events';
 
 // Objects from HostingConstruct
 export interface PipelineProps extends StaticProps {
@@ -75,6 +76,12 @@ export class PipelineConstruct extends Construct {
   
     // create pipeline
     this.codePipeline = this.createPipeline(props);
+
+    // Create a rule to capture execution events and dispatch to event bus
+    new EventsConstruct(this, 'Events', {
+      ...props,
+      codePipeline: this.codePipeline,
+    });
 
     // Create an output for the pipeline's name
     new CfnOutput(this, 'PipelineName', {

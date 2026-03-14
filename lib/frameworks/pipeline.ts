@@ -5,6 +5,7 @@ import { GitHubSourceAction, GitHubTrigger, CodeBuildAction } from "aws-cdk-lib/
 import { PipelineProject, LinuxArmBuildImage, ComputeType, BuildSpec } from "aws-cdk-lib/aws-codebuild";
 import { NuxtProps } from "../../types/NuxtProps";
 import { getResourceIdPrefix } from "../utils";
+import { EventsConstruct } from "../constructs/events";
 
 export class FrameworkPipeline extends Construct {
   private resourceIdPrefix: string;
@@ -72,6 +73,12 @@ export class FrameworkPipeline extends Construct {
         },
         // TODO: Add Deploy stage based on framework needs (S3/Lambda update)
       ],
+    });
+
+    // Create a rule to capture execution events and dispatch to event bus
+    new EventsConstruct(this, 'Events', {
+      ...props,
+      codePipeline: this.codePipeline,
     });
 
     new CfnOutput(this, "CodePipelineName", {

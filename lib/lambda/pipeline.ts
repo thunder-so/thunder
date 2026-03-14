@@ -11,6 +11,7 @@ import { DockerImageAsset } from "aws-cdk-lib/aws-ecr-assets";
 import { Repository } from "aws-cdk-lib/aws-ecr";
 import { LambdaProps } from "../../types/LambdaProps";
 import { getResourceIdPrefix } from "../utils";
+import { EventsConstruct } from "../constructs/events";
 
 export interface LambdaPipelineProps extends LambdaProps {
   repository: Repository;
@@ -65,6 +66,11 @@ export class PipelineConstruct extends Construct {
       this.codePipeline = this.createPipeline(props);
     }
   
+    // Create a rule to capture execution events and dispatch to event bus
+    new EventsConstruct(this, 'Events', {
+      ...props,
+      codePipeline: this.codePipeline,
+    });
 
     // Output pipeline name
     new CfnOutput(this, "CodePipelineName", {

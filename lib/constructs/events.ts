@@ -5,10 +5,12 @@ import { Role, ServicePrincipal, PolicyDocument, PolicyStatement, Effect } from 
 import { RemovalPolicy } from 'aws-cdk-lib';
 import { Pipeline } from 'aws-cdk-lib/aws-codepipeline';
 import { CloudWatchLogGroup, EventBus as EventBusTarget } from 'aws-cdk-lib/aws-events-targets';
-import { SPAProps } from '../stack/SPAProps';
+import { getResourceIdPrefix } from '../utils';
+import { AppProps } from '../../types/AppProps';
 
-export interface EventsProps extends SPAProps {
+export interface EventsProps extends AppProps {
   codePipeline: Pipeline;
+  eventTarget?: string;
 }
 
 export class EventsConstruct extends Construct {
@@ -18,7 +20,7 @@ export class EventsConstruct extends Construct {
     super(scope, id);
 
     // Set the resource prefix
-    this.resourceIdPrefix = `${props.application.substring(0, 7)}-${props.service.substring(0, 7)}-${props.environment.substring(0, 7)}`.substring(0, 23).toLowerCase();
+    this.resourceIdPrefix = getResourceIdPrefix(props.application, props.service, props.environment);
 
     // Create a rule to capture execution events
     const rule = new Rule(this, 'EventsRule', {
@@ -55,30 +57,32 @@ export class EventsConstruct extends Construct {
       rule.addTarget(new CloudWatchLogGroup(logGroup));
     }
 
-    // Create IAM role for cross-account event bus access
-    const crossAccountEventRole = new Role(this, 'CrossAccountEventRole', {
-      assumedBy: new ServicePrincipal('events.amazonaws.com'),
-      roleName: `${this.resourceIdPrefix}-CrossAccountEventRole`,
-      description: 'Role for EventBridge to write pipeline events to external Event Bus',
-      inlinePolicies: {
-        AllowPutEvents: new PolicyDocument({
-          statements: [
-            new PolicyStatement({
-              effect: Effect.ALLOW,
-              actions: ['events:PutEvents'],
-              resources: [props.eventTarget!],
-            }),
-          ],
-        }),
-      },
-    });
+    if (props.eventTarget) {
+      // Create IAM role for cross-account event bus access
+      const crossAccountEventRole = new Role(this, 'CrossAccountEventRole', {
+        assumedBy: new ServicePrincipal('events.amazonaws.com'),
+        roleName: `${this.resourceIdPrefix}-CrossAccountEventRole`,
+        description: 'Role for EventBridge to write pipeline events to external Event Bus',
+        inlinePolicies: {
+          AllowPutEvents: new PolicyDocument({
+            statements: [
+              new PolicyStatement({
+                effect: Effect.ALLOW,
+                actions: ['events:PutEvents'],
+                resources: [props.eventTarget],
+              }),
+            ],
+          }),
+        },
+      });
 
-    // add external event bus as target
-    const target = EventBus.fromEventBusArn(this, 'CrossAccountEventTarget', props.eventTarget!);
+      // add external event bus as target
+      const target = EventBus.fromEventBusArn(this, 'CrossAccountEventTarget', props.eventTarget);
 
-    rule.addTarget(new EventBusTarget(target, {
-      role: crossAccountEventRole
-    }));
+      rule.addTarget(new EventBusTarget(target, {
+        role: crossAccountEventRole
+      }));
+    }
 
   }
 }

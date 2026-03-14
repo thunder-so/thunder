@@ -9,6 +9,7 @@ import { Repository } from 'aws-cdk-lib/aws-ecr';
 import { FargateService, TaskDefinition } from 'aws-cdk-lib/aws-ecs';
 import { FargateProps } from '../../types/FargateProps';
 import { getResourceIdPrefix } from '../utils';
+import { EventsConstruct } from '../constructs/events';
 
 export interface WebServicePipelineProps extends FargateProps {
   clusterName: string;
@@ -43,6 +44,12 @@ export class PipelineConstruct extends Construct {
     this.deployProject = this.createDeployProject(props);
 
     this.codePipeline = this.createPipeline(props);
+
+    // Create a rule to capture execution events and dispatch to event bus
+    new EventsConstruct(this, 'Events', {
+      ...props,
+      codePipeline: this.codePipeline,
+    });
 
     // Output pipeline name
     new CfnOutput(this, 'CodePipelineName', {

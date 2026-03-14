@@ -9,6 +9,7 @@ import { GitHubSourceAction, GitHubTrigger, CodeBuildAction, CodeBuildActionType
 import { Repository } from 'aws-cdk-lib/aws-ecr';
 import { Ec2Props } from '../../types/Ec2Props';
 import { getResourceIdPrefix } from '../utils';
+import { EventsConstruct } from '../constructs/events';
 
 interface EC2PipelineProps extends Ec2Props {
   instanceId: string;
@@ -39,6 +40,12 @@ export class PipelineConstruct extends Construct {
     this.codeBuildProject = this.createBuildProject(props);
     this.deployProject = this.createDeployProject(props);
     this.codePipeline = this.createPipeline(props);
+
+    // Create a rule to capture execution events and dispatch to event bus
+    new EventsConstruct(this, 'Events', {
+      ...props,
+      codePipeline: this.codePipeline,
+    });
 
     new CfnOutput(this, 'CodePipelineName', {
       value: this.codePipeline.pipelineName,
