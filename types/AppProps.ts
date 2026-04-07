@@ -1,4 +1,4 @@
-import { type StackProps } from "aws-cdk-lib"
+import { type StackProps } from "aws-cdk-lib";
 
 /**
  * Application identity and environment properties

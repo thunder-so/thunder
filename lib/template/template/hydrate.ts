@@ -75,7 +75,7 @@ interface FqdnEntry {
 export function hydrateTemplate(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   parsedTemplate: any,
-  options: HydrateOptions
+  options: HydrateOptions,
 ): HydrateResult {
   const { domain, envVars = {}, fallbackPort } = options;
 
@@ -97,7 +97,8 @@ export function hydrateTemplate(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const kept: any[] = [];
     for (const entry of service.environment as string[]) {
-      const match = /^(?:SERVICE_FQDN|SERVICE_URL)_([A-Z0-9_]+)(?:_(\d+))?$/.exec(entry);
+      const match =
+        /^(?:SERVICE_FQDN|SERVICE_URL)_([A-Z0-9_]+)(?:_(\d+))?$/.exec(entry);
       if (match) {
         fqdnEntries.push({
           fullKey: entry,
@@ -161,11 +162,16 @@ export function hydrateTemplate(
   let hydratedStr = templateStr;
 
   // Order by key length descending to avoid partial matches
-  const sortedKeys = Object.keys(resolvedVars).sort((a, b) => b.length - a.length);
+  const sortedKeys = Object.keys(resolvedVars).sort(
+    (a, b) => b.length - a.length,
+  );
 
   for (const key of sortedKeys) {
     const val = resolvedVars[key];
-    const bracedWithDefaultRe = new RegExp(`\\\\$\\\\{${key}(?::-?[^}]*)?\\\\}`, "g");
+    const bracedWithDefaultRe = new RegExp(
+      `\\\\$\\\\{${key}(?::-?[^}]*)?\\\\}`,
+      "g",
+    );
     hydratedStr = hydratedStr.replace(bracedWithDefaultRe, val);
 
     const unbracedSubRe = new RegExp(`(?<!\\\\$)\\\\$${key}\\\\b`, "g");
@@ -186,12 +192,19 @@ export function hydrateTemplate(
   } else if (fallbackPort) {
     const firstServiceKey = Object.keys(hydratedTemplate.services ?? {})[0];
     if (firstServiceKey) {
-      const syntheticEntries: FqdnEntry[] = [{
-        fullKey: `SERVICE_FQDN_APP_${fallbackPort}`,
-        serviceName: firstServiceKey.toUpperCase(),
-        port: fallbackPort,
-      }];
-      patchNetworkingAndProxy(hydratedTemplate, syntheticEntries, domain, firstServiceKey);
+      const syntheticEntries: FqdnEntry[] = [
+        {
+          fullKey: `SERVICE_FQDN_APP_${fallbackPort}`,
+          serviceName: firstServiceKey.toUpperCase(),
+          port: fallbackPort,
+        },
+      ];
+      patchNetworkingAndProxy(
+        hydratedTemplate,
+        syntheticEntries,
+        domain,
+        firstServiceKey,
+      );
     }
   }
 
@@ -211,7 +224,10 @@ export function hydrateTemplate(
     hydratedTemplate.volumes = template.volumes;
   }
 
-  for (const svc of Object.values(hydratedTemplate.services ?? {}) as Record<string, any>[]) {
+  for (const svc of Object.values(hydratedTemplate.services ?? {}) as Record<
+    string,
+    any
+  >[]) {
     if (!svc.volumes || !Array.isArray(svc.volumes)) continue;
 
     svc.volumes = svc.volumes.map((vol: any) => {
@@ -225,7 +241,8 @@ export function hydrateTemplate(
         }
       } else if (typeof vol === "object" && vol !== null) {
         if (vol.type !== "bind" && vol.type !== "tmpfs" && vol.source) {
-          const isBindMount = vol.source.startsWith("/") || vol.source.startsWith(".");
+          const isBindMount =
+            vol.source.startsWith("/") || vol.source.startsWith(".");
           if (!isBindMount) {
             vol.type = "bind";
             vol.source = `./volumes/${vol.source}`;
@@ -274,15 +291,18 @@ function patchNetworkingAndProxy(
   template: any,
   fqdnEntries: FqdnEntry[],
   domain?: string,
-  knownServiceKey?: string
+  knownServiceKey?: string,
 ): void {
   const services: Record<string, unknown> = template.services ?? {};
   const proxiedServiceKeys = new Set<string>();
 
   for (const entry of fqdnEntries) {
-    const targetServiceKey = knownServiceKey ?? findServiceForFqdn(entry.serviceName, services);
+    const targetServiceKey =
+      knownServiceKey ?? findServiceForFqdn(entry.serviceName, services);
     if (!targetServiceKey) {
-      console.warn(`[hydrate] Could not find compose service for FQDN entry ${entry.fullKey} — skipping label injection`);
+      console.warn(
+        `[hydrate] Could not find compose service for FQDN entry ${entry.fullKey} — skipping label injection`,
+      );
       continue;
     }
 
@@ -301,7 +321,7 @@ function patchNetworkingAndProxy(
         `traefik.http.routers.${routerName}.entrypoints=websecure`,
         `traefik.http.routers.${routerName}.tls=true`,
         `traefik.http.routers.${routerName}.tls.certresolver=letsencrypt`,
-        `traefik.http.services.${routerName}.loadbalancer.server.port=${entry.port}`
+        `traefik.http.services.${routerName}.loadbalancer.server.port=${entry.port}`,
       );
 
       svc.labels = labels;
@@ -329,13 +349,17 @@ function patchNetworkingAndProxy(
 
 function findServiceForFqdn(
   fqdnServiceName: string,
-  services: Record<string, unknown>
+  services: Record<string, unknown>,
 ): string | undefined {
   const lowerFqdnName = fqdnServiceName.toLowerCase();
   if (lowerFqdnName in services) return lowerFqdnName;
-  const match = Object.keys(services).find((k) => lowerFqdnName.startsWith(k.toLowerCase()));
+  const match = Object.keys(services).find((k) =>
+    lowerFqdnName.startsWith(k.toLowerCase()),
+  );
   if (match) return match;
-  return Object.keys(services).find((k) => k.toLowerCase().startsWith(lowerFqdnName));
+  return Object.keys(services).find((k) =>
+    k.toLowerCase().startsWith(lowerFqdnName),
+  );
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -355,7 +379,7 @@ function resolveVariable(
   key: string,
   domain: string | undefined,
   envVars: Record<string, string>,
-  defaultValue?: string
+  defaultValue?: string,
 ): string {
   if (key in envVars) return envVars[key];
   if (key.startsWith("SERVICE_") || key.startsWith("COOLIFY_VOLUME_")) {
@@ -367,12 +391,17 @@ function resolveVariable(
 function generateValue(key: string, domain?: string): string {
   if (key.startsWith("SERVICE_PASSWORD_64_")) return randomAlphanumeric(64);
   if (key.startsWith("SERVICE_PASSWORD_")) return randomAlphanumeric(32);
-  if (key.startsWith("SERVICE_USER_")) return randomAlphanumeric(8).toLowerCase();
-  if (key.startsWith("SERVICE_BASE64_64_")) return randomBytes(64).toString("base64");
-  if (key.startsWith("SERVICE_BASE64URL_")) return randomBytes(32).toString("base64url");
-  if (key.startsWith("SERVICE_BASE64_")) return randomBytes(32).toString("base64");
+  if (key.startsWith("SERVICE_USER_"))
+    return randomAlphanumeric(8).toLowerCase();
+  if (key.startsWith("SERVICE_BASE64_64_"))
+    return randomBytes(64).toString("base64");
+  if (key.startsWith("SERVICE_BASE64URL_"))
+    return randomBytes(32).toString("base64url");
+  if (key.startsWith("SERVICE_BASE64_"))
+    return randomBytes(32).toString("base64");
   if (key.startsWith("SERVICE_FQDN_")) return domain ?? "localhost";
-  if (key.startsWith("SERVICE_URL_")) return domain ? `https://${domain}` : "http://localhost";
+  if (key.startsWith("SERVICE_URL_"))
+    return domain ? `https://${domain}` : "http://localhost";
   if (key.startsWith("COOLIFY_VOLUME_")) {
     const name = key.replace("COOLIFY_VOLUME_", "").toLowerCase();
     return `./volumes/${name}`;
@@ -381,7 +410,10 @@ function generateValue(key: string, domain?: string): string {
 }
 
 function randomAlphanumeric(length: number): string {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const bytes = randomBytes(length);
-  return Array.from(bytes).map((b) => chars[b % chars.length]).join("");
+  return Array.from(bytes)
+    .map((b) => chars[b % chars.length])
+    .join("");
 }

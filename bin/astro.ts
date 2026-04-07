@@ -1,6 +1,11 @@
 import { App } from "aws-cdk-lib";
-import { Astro, type AstroProps } from '../';
-import { getMetadata, resolveEnv, mapLambdaRuntime, mapLambdaArch } from './utils';
+import { Astro, type AstroProps } from "../";
+import {
+  getMetadata,
+  resolveEnv,
+  mapLambdaRuntime,
+  mapLambdaArch,
+} from "./utils";
 
 const app = new App();
 const raw = getMetadata(app);
@@ -10,10 +15,18 @@ const metadata: AstroProps = {
   env: resolveEnv(raw),
   serverProps: {
     ...raw.serverProps,
-    ...( mapLambdaRuntime(raw.serverProps?.runtime) && { runtime: mapLambdaRuntime(raw.serverProps?.runtime) }),
-    ...( mapLambdaArch(raw.serverProps?.architecture) && { architecture: mapLambdaArch(raw.serverProps?.architecture) }),
+    ...(mapLambdaRuntime(raw.serverProps?.runtime) && {
+      runtime: mapLambdaRuntime(raw.serverProps?.runtime),
+    }),
+    ...(mapLambdaArch(raw.serverProps?.architecture) && {
+      architecture: mapLambdaArch(raw.serverProps?.architecture),
+    }),
   },
 };
 
-new Astro(app, `${metadata.application}-${metadata.service}-${metadata.environment}-stack`, metadata);
+new Astro(
+  app,
+  `${metadata.application}-${metadata.service}-${metadata.environment}-stack`,
+  metadata,
+);
 app.synth();

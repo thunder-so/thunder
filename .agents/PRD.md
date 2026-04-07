@@ -16,25 +16,27 @@ Thunder provides high-level abstractions over AWS CDK, enabling developers to de
 
 ## Stacks
 
-| Stack | Description | Use Cases | Status |
-|-----------|-------------|-----------|--------|
-| `Static` | S3 + CloudFront for static SPAs | React, Vue, Svelte, Next.js (SSG), Gatsby | **DONE** |
-| `Lambda` | Lambda + API Gateway for serverless | API endpoints, background jobs, microservices | **DONE** |
-| `Fargate` | ECS Fargate + ALB for containers | Long-running containers, microservices | **DONE** |
-| `EC2` | EC2 instance with Docker + Elastic IP | Single containers, dev environments | **DONE** |
-| `Template` | Coolify One-Click Service Template on EC2 | Pre-built apps (n8n, Plausible, etc.) | **DONE** |
-| `Serverless` | Unified full-stack serverless (Lambda + S3 + CloudFront) | SSR meta-frameworks | **DONE** |
-| `Nuxt` / `Astro` / `TanStackStart` / `SvelteKit` / `SolidStart` / `AnalogJS` | Framework-specific wrappers over `Serverless` | SSR applications per framework | **DONE** |
-| `Vpc` | Shared VPC with public/private subnets | Shared networking infrastructure | **DONE** |
+| Stack                                                                        | Description                                              | Use Cases                                     | Status   |
+| ---------------------------------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------- | -------- |
+| `Static`                                                                     | S3 + CloudFront for static SPAs                          | React, Vue, Svelte, Next.js (SSG), Gatsby     | **DONE** |
+| `Lambda`                                                                     | Lambda + API Gateway for serverless                      | API endpoints, background jobs, microservices | **DONE** |
+| `Fargate`                                                                    | ECS Fargate + ALB for containers                         | Long-running containers, microservices        | **DONE** |
+| `EC2`                                                                        | EC2 instance with Docker + Elastic IP                    | Single containers, dev environments           | **DONE** |
+| `Template`                                                                   | Coolify One-Click Service Template on EC2                | Pre-built apps (n8n, Plausible, etc.)         | **DONE** |
+| `Serverless`                                                                 | Unified full-stack serverless (Lambda + S3 + CloudFront) | SSR meta-frameworks                           | **DONE** |
+| `Nuxt` / `Astro` / `TanStackStart` / `SvelteKit` / `SolidStart` / `AnalogJS` | Framework-specific wrappers over `Serverless`            | SSR applications per framework                | **DONE** |
+| `Vpc`                                                                        | Shared VPC with public/private subnets                   | Shared networking infrastructure              | **DONE** |
 
 ---
 
 ## Stack Details
 
 ### 1. Static Stack
+
 **Purpose**: Static SPA hosting
 **Resources**: S3 + CloudFront (OAC) + Route53 + Lambda@Edge
 **Key Features**:
+
 - Zero-downtime deployment without bucket pruning
 - Origin Access Control (OAC) for secure S3 access
 - Lambda@Edge for redirects/rewrites
@@ -44,14 +46,17 @@ Thunder provides high-level abstractions over AWS CDK, enabling developers to de
 **Entry Point**: `bin/static.ts`
 **Stack File**: `stacks/StaticStack.ts`
 **Constructs**:
+
 - `HostingConstruct` (S3 + CloudFront + Route53)
 - `DeployConstruct` (direct local deployment)
 - `PipelineConstruct` (CodePipeline CI/CD)
 
 ### 2. Lambda Stack
+
 **Purpose**: Serverless functions
 **Resources**: Lambda (Zip or Container) + API Gateway v2 + ECR + Route53
 **Key Features**:
+
 - Bun runtime support via Lambda Layer
 - Keep-warm scheduling (EventBridge)
 - Provisioned concurrency support
@@ -61,13 +66,16 @@ Thunder provides high-level abstractions over AWS CDK, enabling developers to de
 **Entry Point**: `bin/lambda.ts`
 **Stack File**: `stacks/LambdaStack.ts`
 **Constructs**:
+
 - `FunctionsConstruct` (Lambda + API Gateway)
 - `PipelineConstruct` (ECR-based CI/CD)
 
 ### 3. Fargate Stack
+
 **Purpose**: Container orchestration
 **Resources**: ECS Fargate + ALB + VPC + ECR + Route53
 **Key Features**:
+
 - ARM64 or X86_64 architecture support
 - Auto-scaling capabilities
 - Health checks with customizable paths
@@ -78,13 +86,16 @@ Thunder provides high-level abstractions over AWS CDK, enabling developers to de
 **Entry Point**: `bin/fargate.ts`
 **Stack File**: `stacks/FargateStack.ts`
 **Constructs**:
+
 - `ServiceConstruct` (ECS service + ALB + VPC)
 - `PipelineConstruct` (ECR-based CI/CD)
 
 ### 4. EC2 Stack
+
 **Purpose**: Single EC2 container hosting
 **Resources**: EC2 + Elastic IP + Route53 + CloudWatch Agent
 **Key Features**:
+
 - Docker-on-EC2 deployment
 - Elastic IP assignment
 - Let's Encrypt SSL (via acmeEmail)
@@ -95,6 +106,7 @@ Thunder provides high-level abstractions over AWS CDK, enabling developers to de
 **Entry Point**: `bin/ec2.ts`
 **Stack File**: `stacks/Ec2Stack.ts`
 **Constructs**:
+
 - `ComputeConstruct` (EC2 instance + Docker)
 - `PipelineConstruct` (CI/CD)
 - `Ec2Instance` (instance provisioning)
@@ -102,9 +114,11 @@ Thunder provides high-level abstractions over AWS CDK, enabling developers to de
 - `CloudwatchAgent` (monitoring)
 
 ### 5. Template Stack
+
 **Purpose**: Coolify one-click templates
 **Resources**: EC2 + Docker Compose + Traefik
 **Key Features**:
+
 - Fetches templates from Coolify GitHub repo
 - Hydrates SERVICE_FQDN, SERVICE_PASSWORD variables
 - Traefik reverse proxy with Let's Encrypt
@@ -113,14 +127,17 @@ Thunder provides high-level abstractions over AWS CDK, enabling developers to de
 **Entry Point**: `bin/template.ts`
 **Stack File**: `stacks/TemplateStack.ts`
 **Constructs**:
+
 - `TemplateConstruct` (template deployment)
 - `TemplateFetcher` (fetches from GitHub)
 - `TemplateHydrator` (variable substitution)
 
 ### 6. Serverless Stack (Unified Full-Stack)
+
 **Purpose**: Full-stack SSR deployment for meta-frameworks
 **Resources**: Lambda (SSR) + S3 (static assets) + CloudFront (dual origin) + API Gateway
 **Key Features**:
+
 - Single unified stack for all SSR meta-frameworks
 - Framework-specific configs via `FRAMEWORK_CONFIGS` (server dir, client dir, handler, nitro preset)
 - Optional Lambda@Edge fallback for 404/403 (Astro only, `requiresFallbackEdge: true`)
@@ -130,6 +147,7 @@ Thunder provides high-level abstractions over AWS CDK, enabling developers to de
 **Entry Points**: `bin/nuxt.ts`, `bin/astro.ts`, `bin/tanstack-start.ts`, `bin/sveltekit.ts`, `bin/solid-start.ts`, `bin/analogjs.ts`
 **Stack File**: `stacks/ServerlessStack.ts`
 **Constructs**:
+
 - `ServerlessServer` (`lib/serverless/server.ts`) — Lambda + API Gateway
 - `ServerlessClient` (`lib/serverless/client.ts`) — S3 + CloudFront
 - `ServerlessPipeline` (`lib/serverless/pipeline.ts`) — CodePipeline CI/CD
@@ -146,9 +164,11 @@ Thunder provides high-level abstractions over AWS CDK, enabling developers to de
 | `analogjs` | `dist/analog/server` | `dist/analog/public` | `index.handler` | No |
 
 ### 7. VPC Stack
+
 **Purpose**: Shared VPC infrastructure
 **Resources**: VPC with public/private subnets, NAT gateways
 **Key Features**:
+
 - Shared networking for multiple services
 - Implements IVpcLink interface
 - Configurable CIDR, AZs, NAT gateways
@@ -156,6 +176,7 @@ Thunder provides high-level abstractions over AWS CDK, enabling developers to de
 
 **Stack File**: `stacks/VpcStack.ts`
 **Constructs**:
+
 - `VPC` (`lib/constructs/vpc.ts`)
 
 ---
@@ -278,11 +299,13 @@ Thunder provides high-level abstractions over AWS CDK, enabling developers to de
 ├── index.ts                      # Main exports
 └── package.json
 ```
+
 ---
 
 ## Shared Infrastructure Patterns
 
 ### VPC Link Pattern
+
 All compute stacks (Lambda, Fargate, EC2, Template) support a `link` pattern for VPC integration:
 
 - Implemented via `resolveVpc()` utility
@@ -306,13 +329,17 @@ new FargateStack(this, 'MyService', {
 ```
 
 ### Resource Naming
+
 **Pattern**: 23-character prefix ensuring uniqueness and AWS name limits
+
 - **Format**: `${app.substring(0,7)}-${service.substring(0,7)}-${env.substring(0,7)}`
 - **Utility**: `getResourceIdPrefix()` in `lib/utils/naming.ts`
 - **Example**: `myapp-t-web-dev` (app="myapplication", service="webfrontend", env="development")
 
 ### Path Sanitization
+
 **Purpose**: Ensure valid Unix directory paths for Docker builds and deployments
+
 - **Utility**: `sanitizePath()` in `lib/utils/paths.ts`
 - **Regex**: Removes invalid characters, normalizes slashes
 - **Use Case**: User-provided rootDir/outputDir sanitization
@@ -322,30 +349,39 @@ new FargateStack(this, 'MyService', {
 ## Common Features Across Stacks
 
 ### 1. Monorepo Support
+
 - **Path-based filters** in CodeBuild webhooks
 - **rootDir/outputDir** resolution for monorepo packages
 - **Context directory** support for taking source from any path
 
 ### 2. CI/CD Pipeline Integration
+
 Optional AWS CodePipeline with GitHub support:
+
 - Triggered by `accessTokenSecretArn` + `sourceProps` + `buildProps`
 - Path-based filtering for monorepos
 - ECR integration for container stacks
 - S3 deployment for static stacks
 
 ### 3. Nixpacks Integration
+
 Automatic Dockerfile generation:
+
 - **Utility**: `generateNixpacksDockerfile()` in `lib/utils/nixpacks.ts`
 - **Supported**: Fargate, EC2, Template stacks
 - **Build system**: Detects language and generates optimized Dockerfile
 
 ### 4. Framework Fallbacks
+
 Astro-specific Edge function for 404/403 handling:
+
 - Implemented in `lib/astro/client.ts`
 - CloudFront origin failover to S3 for SPA routing
 
 ### 5. Bun Support
+
 Bun runtime for Lambda:
+
 - Lambda Layer integration
 - Custom runtime configuration for CodeBuild
 
@@ -353,30 +389,31 @@ Bun runtime for Lambda:
 
 ## Status Overview
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| **Static Stack** | [x] **DONE** | Production-ready |
-| **Lambda Stack** | [x] **DONE** | Production-ready |
-| **Fargate Stack** | [x] **DONE** | Production-ready |
-| **EC2 Stack** | [x] **DONE** | Production-ready |
-| **Template Stack** | [x] **DONE** | Production-ready |
-| **Serverless Stack** | [x] **DONE** | Unified SSR stack for all meta-frameworks |
-| **Nuxt / Astro / TanStack / SvelteKit / SolidStart / AnalogJS** | [x] **DONE** | Framework wrappers over ServerlessStack |
-| **VPC Stack** | [x] **DONE** | Production-ready |
-| **VPC Link Pattern** | [x] **DONE** | All compute stacks |
-| **Monorepo Support** | [x] **DONE** | Path filters, rootDir |
-| **Nixpacks Integration** | [x] **DONE** | Auto Dockerfile gen |
-| **Metadata Discovery** | [x] **DONE** | SST-style in S3 (metadata.json + context.json) |
-| **CI/CD Pipelines** | [x] **DONE** | CodePipeline + GitHub |
-| **Bun Support** | [x] **DONE** | Lambda layer |
-| **EventBridge Pipeline Events** | [x] **DONE** | EventsConstruct for cross-account event forwarding |
-| **CLI Framework** | [x] **DONE** | Basic structure |
+| Feature                                                         | Status       | Notes                                              |
+| --------------------------------------------------------------- | ------------ | -------------------------------------------------- |
+| **Static Stack**                                                | [x] **DONE** | Production-ready                                   |
+| **Lambda Stack**                                                | [x] **DONE** | Production-ready                                   |
+| **Fargate Stack**                                               | [x] **DONE** | Production-ready                                   |
+| **EC2 Stack**                                                   | [x] **DONE** | Production-ready                                   |
+| **Template Stack**                                              | [x] **DONE** | Production-ready                                   |
+| **Serverless Stack**                                            | [x] **DONE** | Unified SSR stack for all meta-frameworks          |
+| **Nuxt / Astro / TanStack / SvelteKit / SolidStart / AnalogJS** | [x] **DONE** | Framework wrappers over ServerlessStack            |
+| **VPC Stack**                                                   | [x] **DONE** | Production-ready                                   |
+| **VPC Link Pattern**                                            | [x] **DONE** | All compute stacks                                 |
+| **Monorepo Support**                                            | [x] **DONE** | Path filters, rootDir                              |
+| **Nixpacks Integration**                                        | [x] **DONE** | Auto Dockerfile gen                                |
+| **Metadata Discovery**                                          | [x] **DONE** | SST-style in S3 (metadata.json + context.json)     |
+| **CI/CD Pipelines**                                             | [x] **DONE** | CodePipeline + GitHub                              |
+| **Bun Support**                                                 | [x] **DONE** | Lambda layer                                       |
+| **EventBridge Pipeline Events**                                 | [x] **DONE** | EventsConstruct for cross-account event forwarding |
+| **CLI Framework**                                               | [x] **DONE** | Basic structure                                    |
 
 ---
 
 ## Supported Frameworks & Patterns
 
 ### Static Sites
+
 - **Vite-based**: React, Vue, Svelte, Solid
 - **Next.js**: Static Site Generation (SSG)
 - **Astro**: Static Site Generation
@@ -384,18 +421,21 @@ Bun runtime for Lambda:
 - **Other**: Any framework outputting to a directory
 
 ### Serverless
+
 - **Node.js**: Lambda functions
 - **Bun**: Via Lambda Layer
 - **Containers**: Container-based Lambda
 - **Runtimes**: Node.js 18.x, 20.x
 
 ### Containers
+
 - **ECS Fargate**: Serverless containers with ALB
 - **EC2 Docker**: Single-container on EC2
 - **Architectures**: ARM64, X86_64
 - **Orchestration**: Supports docker-compose (Template)
 
 ### Full-Stack SSR
+
 - **Nuxt.js**: Universal Vue applications
 - **Astro**: Content-focused websites with SSR (Lambda@Edge fallback)
 - **TanStack Start**: Type-safe full-stack React
@@ -421,35 +461,38 @@ Bun runtime for Lambda:
 ## Quick Start
 
 ### Installation
+
 ```bash
 bun add @thunder-so/thunder -d
 ```
 
 ### Basic Usage
+
 ```typescript
 // stack/dev.ts
-import { Cdk, Static, type StaticProps } from '@thunder-so/thunder';
+import { Cdk, Static, type StaticProps } from "@thunder-so/thunder";
 
 const myApp: StaticProps = {
-  env: { 
-    account: '123456789012', 
-    region: 'us-east-1' 
+  env: {
+    account: "123456789012",
+    region: "us-east-1",
   },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
-  outputDir: 'dist',
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
+  outputDir: "dist",
 };
 
 new Static(
   new Cdk.App(),
   `${myApp.application}-${myApp.service}-${myApp.environment}-stack`,
-  myApp
+  myApp,
 );
 ```
 
 ### Deployment
+
 ```bash
 npx cdk deploy --app "npx tsx stack/dev.ts" --profile default
 ```

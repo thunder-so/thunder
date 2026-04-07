@@ -1,4 +1,4 @@
-import { IVpc } from 'aws-cdk-lib/aws-ec2';
+import { IVpc } from "aws-cdk-lib/aws-ec2";
 
 /**
  * Interface for constructs that can be linked to a VPC.

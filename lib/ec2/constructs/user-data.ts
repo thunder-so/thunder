@@ -71,7 +71,8 @@ export function buildUserData(props: UserDataProps): UserData {
     `sudo mkdir -p /home/ubuntu/.ssh`,
     `sudo chmod 700 /home/ubuntu/.ssh`,
     ...props.authorizedKeys.map(
-      (key) => `sudo echo "${escapeForBash(key)}" >> /home/ubuntu/.ssh/authorized_keys`
+      (key) =>
+        `sudo echo "${escapeForBash(key)}" >> /home/ubuntu/.ssh/authorized_keys`,
     ),
     `sudo chmod 600 /home/ubuntu/.ssh/authorized_keys`,
     `sudo chown -R ubuntu:ubuntu /home/ubuntu/.ssh`,
@@ -90,7 +91,7 @@ export function buildUserData(props: UserDataProps): UserData {
     `echo "==> Writing CloudWatch agent config"`,
     writeHereDoc(
       "/tmp/amazon-cloudwatch-agent-config.json",
-      props.cloudWatchAgentConfig
+      props.cloudWatchAgentConfig,
     ),
 
     `echo "==> Starting CloudWatch agent"`,
@@ -119,7 +120,7 @@ export function buildUserData(props: UserDataProps): UserData {
     `docker pull ${props.imageUri}`,
 
     `echo "==> Starting application container"`,
-    props.domain 
+    props.domain
       ? `docker run -d \\
           --name app \\
           --restart unless-stopped \\
@@ -140,7 +141,7 @@ export function buildUserData(props: UserDataProps): UserData {
           ${props.imageUri}`,
 
     `echo "==> Container status: $(docker ps -a --filter name=app)"`,
-    `echo "==> Bootstrap complete at $(date)"`
+    `echo "==> Bootstrap complete at $(date)"`,
   );
 
   return userData;

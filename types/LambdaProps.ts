@@ -1,7 +1,7 @@
-import { AppProps } from './AppProps'
-import { PipelineWithRuntimeProps  } from './PipelineProps'
-import { Runtime, Architecture } from 'aws-cdk-lib/aws-lambda'
-import { VpcLinkProps } from './VpcProps'
+import { AppProps } from "./AppProps";
+import { PipelineWithRuntimeProps } from "./PipelineProps";
+import { Runtime, Architecture } from "aws-cdk-lib/aws-lambda";
+import { VpcLinkProps } from "./VpcProps";
 
 /**
  * Lambda function configuration properties
@@ -62,7 +62,7 @@ interface LambdaFunctionProps {
   /**
    * Create a secret with AWS Secrets Manager and pass them to the Lambda function as environment variables.
    * The library will create permission for Lambda to access the secret value.
-   * 
+   *
    *   secrets: [
    *     { key: 'PUBLIC_EXAMPLE', resource: 'your-secret-arn' }
    *   ]
@@ -105,10 +105,7 @@ interface LambdaDomainProps {
   readonly hostedZoneId?: string;
 }
 
-export interface LambdaProps extends 
-  PipelineWithRuntimeProps,
-  LambdaDomainProps, 
-  AppProps,
-  VpcLinkProps {
-    readonly functionProps?: LambdaFunctionProps;
+export interface LambdaProps
+  extends PipelineWithRuntimeProps, LambdaDomainProps, AppProps, VpcLinkProps {
+  readonly functionProps?: LambdaFunctionProps;
 }

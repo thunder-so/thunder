@@ -1,12 +1,15 @@
-import { Stack } from 'aws-cdk-lib';
-import { IRole } from 'aws-cdk-lib/aws-iam';
-import { Construct } from 'constructs';
-import { ServerlessProps } from '../types/ServerlessProps';
-import { getFrameworkConfig, mergePropsWithDefaults } from '../lib/utils/framework-config';
-import { ServerlessServer } from '../lib/serverless/server';
-import { ServerlessClient } from '../lib/serverless/client';
-import { ServerlessPipeline } from '../lib/serverless/pipeline';
-import { MetadataConstruct } from '../lib/constructs/metadata';
+import { Stack } from "aws-cdk-lib";
+import { IRole } from "aws-cdk-lib/aws-iam";
+import { Construct } from "constructs";
+import { ServerlessProps } from "../types/ServerlessProps";
+import {
+  getFrameworkConfig,
+  mergePropsWithDefaults,
+} from "../lib/utils/framework-config";
+import { ServerlessServer } from "../lib/serverless/server";
+import { ServerlessClient } from "../lib/serverless/client";
+import { ServerlessPipeline } from "../lib/serverless/pipeline";
+import { MetadataConstruct } from "../lib/constructs/metadata";
 
 export interface ServerlessStackProps extends ServerlessProps {
   framework: string;
@@ -20,27 +23,30 @@ export class ServerlessStack extends Stack {
     const frameworkConfig = getFrameworkConfig(props.framework);
     const mergedProps = mergePropsWithDefaults(props, frameworkConfig);
 
-    const server = new ServerlessServer(this, 'Server', mergedProps);
+    const server = new ServerlessServer(this, "Server", mergedProps);
     this.lambdaRole = server.lambdaFunction.role!;
 
-    const client = new ServerlessClient(this, 'Client', {
+    const client = new ServerlessClient(this, "Client", {
       ...mergedProps,
       httpOrigin: server.httpOrigin,
     });
 
     let pipeline: ServerlessPipeline | undefined;
     if (props.accessTokenSecretArn && props.sourceProps) {
-      pipeline = new ServerlessPipeline(this, 'Pipeline', {
+      pipeline = new ServerlessPipeline(this, "Pipeline", {
         ...mergedProps,
         lambdaFunction: server.lambdaFunction,
         staticAssetsBucket: client.staticAssetsBucket,
         cdn: client.cdn,
-        clientOutputDir: mergedProps.clientProps?.outputDir || frameworkConfig.defaultClientDir,
-        serverCodeDir: mergedProps.serverProps?.codeDir || frameworkConfig.defaultServerDir,
+        clientOutputDir:
+          mergedProps.clientProps?.outputDir ||
+          frameworkConfig.defaultClientDir,
+        serverCodeDir:
+          mergedProps.serverProps?.codeDir || frameworkConfig.defaultServerDir,
       });
     }
 
-    new MetadataConstruct(this, 'Metadata', {
+    new MetadataConstruct(this, "Metadata", {
       ...mergedProps,
       stackType: props.framework,
       stackProps: {

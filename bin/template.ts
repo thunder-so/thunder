@@ -1,13 +1,18 @@
 import { App, Aws } from "aws-cdk-lib";
 import { InstanceType } from "aws-cdk-lib/aws-ec2";
-import { Template, type TemplateProps, fetchTemplate, hydrateTemplate } from '../';
+import {
+  Template,
+  type TemplateProps,
+  fetchTemplate,
+  hydrateTemplate,
+} from "../";
 
 const app = new App();
 
-const rawMetadata: any = app.node.tryGetContext('metadata');
+const rawMetadata: any = app.node.tryGetContext("metadata");
 
 if (!rawMetadata) {
-  throw new Error('Context metadata missing!');
+  throw new Error("Context metadata missing!");
 }
 
 async function main() {
@@ -23,13 +28,19 @@ async function main() {
     acmeEmail: rawMetadata.acmeEmail || undefined,
     logRetentionDays: rawMetadata.logRetentionDays || 30,
     env: {
-      account: rawMetadata.env?.account || process.env.CDK_DEFAULT_ACCOUNT || Aws.ACCOUNT_ID,
-      region: rawMetadata.env?.region || process.env.CDK_DEFAULT_REGION || Aws.REGION,
+      account:
+        rawMetadata.env?.account ||
+        process.env.CDK_DEFAULT_ACCOUNT ||
+        Aws.ACCOUNT_ID,
+      region:
+        rawMetadata.env?.region || process.env.CDK_DEFAULT_REGION || Aws.REGION,
     },
   };
 
   console.log(`[app] Fetching Coolify template: ${config.templateSlug}`);
-  const { parsed: parsedTemplate, port } = await fetchTemplate(config.templateSlug);
+  const { parsed: parsedTemplate, port } = await fetchTemplate(
+    config.templateSlug,
+  );
 
   console.log(`[app] Hydrating template variables`);
   const hydrateResult = hydrateTemplate(parsedTemplate, {
@@ -38,7 +49,7 @@ async function main() {
   });
 
   console.log(
-    `[app] Resolved ${Object.keys(hydrateResult.resolvedVars).length} SERVICE_* variables`
+    `[app] Resolved ${Object.keys(hydrateResult.resolvedVars).length} SERVICE_* variables`,
   );
 
   const metadata: TemplateProps = {
@@ -46,7 +57,11 @@ async function main() {
     hydrateResult,
   };
 
-  new Template(app, `${config.application}-${config.service}-${config.environment}-stack`, metadata);
+  new Template(
+    app,
+    `${config.application}-${config.service}-${config.environment}-stack`,
+    metadata,
+  );
 
   app.synth();
 }

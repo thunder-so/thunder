@@ -57,7 +57,8 @@ export function buildUserData(props: UserDataProps): UserData {
     `mkdir -p /home/ubuntu/.ssh`,
     `chmod 700 /home/ubuntu/.ssh`,
     ...props.authorizedKeys.map(
-      (key) => `echo "${escapeForBash(key)}" >> /home/ubuntu/.ssh/authorized_keys`
+      (key) =>
+        `echo "${escapeForBash(key)}" >> /home/ubuntu/.ssh/authorized_keys`,
     ),
     `chmod 600 /home/ubuntu/.ssh/authorized_keys`,
     `chown -R ubuntu:ubuntu /home/ubuntu/.ssh`,
@@ -75,7 +76,7 @@ export function buildUserData(props: UserDataProps): UserData {
     `mkdir -p /opt/aws/amazon-cloudwatch-agent/etc`,
     writeHereDoc(
       "/opt/aws/amazon-cloudwatch-agent/etc/config.json",
-      props.cloudWatchAgentConfig
+      props.cloudWatchAgentConfig,
     ),
 
     `echo "==> Starting CloudWatch agent"`,
@@ -102,12 +103,12 @@ export function buildUserData(props: UserDataProps): UserData {
 
     writeHereDoc(
       `/data/services/${props.templateSlug}/.env`,
-      props.envFileContent
+      props.envFileContent,
     ),
 
     writeHereDoc(
       `/data/services/${props.templateSlug}/docker-compose.yml`,
-      props.composeYaml
+      props.composeYaml,
     ),
 
     // Pre-create volume directories so they are not created as root by Docker
@@ -128,7 +129,7 @@ export function buildUserData(props: UserDataProps): UserData {
 
     `echo "==> Bootstrap complete at $(date)"`,
     `echo "==> Service status:"`,
-    `docker compose --env-file /data/services/${props.templateSlug}/.env -f /data/services/${props.templateSlug}/docker-compose.yml ps`
+    `docker compose --env-file /data/services/${props.templateSlug}/.env -f /data/services/${props.templateSlug}/docker-compose.yml ps`,
   );
 
   return userData;

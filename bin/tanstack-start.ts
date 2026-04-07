@@ -1,6 +1,11 @@
 import { App } from "aws-cdk-lib";
-import { TanStackStart, type TanStackStartProps } from '../';
-import { getMetadata, resolveEnv, mapLambdaRuntime, mapLambdaArch } from './utils';
+import { TanStackStart, type TanStackStartProps } from "../";
+import {
+  getMetadata,
+  resolveEnv,
+  mapLambdaRuntime,
+  mapLambdaArch,
+} from "./utils";
 
 const app = new App();
 const raw = getMetadata(app);
@@ -10,10 +15,18 @@ const metadata: TanStackStartProps = {
   env: resolveEnv(raw),
   serverProps: {
     ...raw.serverProps,
-    ...( mapLambdaRuntime(raw.serverProps?.runtime) && { runtime: mapLambdaRuntime(raw.serverProps?.runtime) }),
-    ...( mapLambdaArch(raw.serverProps?.architecture) && { architecture: mapLambdaArch(raw.serverProps?.architecture) }),
+    ...(mapLambdaRuntime(raw.serverProps?.runtime) && {
+      runtime: mapLambdaRuntime(raw.serverProps?.runtime),
+    }),
+    ...(mapLambdaArch(raw.serverProps?.architecture) && {
+      architecture: mapLambdaArch(raw.serverProps?.architecture),
+    }),
   },
 };
 
-new TanStackStart(app, `${metadata.application}-${metadata.service}-${metadata.environment}-stack`, metadata);
+new TanStackStart(
+  app,
+  `${metadata.application}-${metadata.service}-${metadata.environment}-stack`,
+  metadata,
+);
 app.synth();

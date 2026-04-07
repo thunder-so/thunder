@@ -12,6 +12,7 @@ cd my-nextjs-app
 ```
 
 When prompted:
+
 - TypeScript: Yes
 - ESLint: Yes
 - Tailwind CSS: Yes (optional)
@@ -27,12 +28,12 @@ Reference: [Next.js Installation Docs](https://nextjs.org/docs/getting-started/i
 Edit `next.config.ts`:
 
 ```typescript
-import type { NextConfig } from 'next';
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'export',
+  output: "export",
   // Optional: change output directory from 'out' to 'dist'
-  distDir: 'dist',
+  distDir: "dist",
 };
 
 export default nextConfig;
@@ -59,25 +60,25 @@ bun add @thunder-so/thunder --development
 Create `stack/prod.ts`:
 
 ```typescript
-import { Cdk, Static, type StaticProps } from '@thunder-so/thunder';
+import { Cdk, Static, type StaticProps } from "@thunder-so/thunder";
 
 const config: StaticProps = {
   env: {
-    account: '123456789012',  // Your AWS account ID
-    region: 'us-east-1',
+    account: "123456789012", // Your AWS account ID
+    region: "us-east-1",
   },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
+  application: "myapp",
+  service: "web",
+  environment: "prod",
 
-  rootDir: '.',
-  outputDir: 'dist',  // Match your next.config.ts distDir
+  rootDir: ".",
+  outputDir: "dist", // Match your next.config.ts distDir
 };
 
 new Static(
   new Cdk.App(),
   `${config.application}-${config.service}-${config.environment}-stack`,
-  config
+  config,
 );
 ```
 
@@ -104,9 +105,10 @@ Update your stack:
 ```typescript
 const config: StaticProps = {
   // ...
-  domain: 'app.example.com',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/abc-123',
-  hostedZoneId: 'Z1234567890ABC',
+  domain: "app.example.com",
+  globalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+  hostedZoneId: "Z1234567890ABC",
 };
 ```
 
@@ -117,11 +119,9 @@ Add URL redirects or rewrites using Lambda@Edge:
 ```typescript
 const config: StaticProps = {
   // ...
-  redirects: [
-    { source: '/old-page', destination: '/new-page' },
-  ],
+  redirects: [{ source: "/old-page", destination: "/new-page" }],
   rewrites: [
-    { source: '/app/*', destination: '/index.html' },  // SPA fallback
+    { source: "/app/*", destination: "/index.html" }, // SPA fallback
   ],
 };
 ```
@@ -136,7 +136,11 @@ Add security or cache headers:
 const config: StaticProps = {
   // ...
   headers: [
-    { path: '/assets/*', name: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+    {
+      path: "/assets/*",
+      name: "Cache-Control",
+      value: "public, max-age=31536000, immutable",
+    },
   ],
 };
 ```
@@ -144,6 +148,7 @@ const config: StaticProps = {
 ## Limitations of Static Export
 
 Next.js static export doesn't support:
+
 - Server-side rendering (SSR)
 - API routes
 - Image optimization (use `unoptimized: true` in `next.config.ts`)

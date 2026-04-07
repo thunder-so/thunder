@@ -1,7 +1,7 @@
-import { AppProps } from './AppProps'
-import { PipelineWithBuildSystemProps  } from './PipelineProps'
-import { CpuArchitecture } from 'aws-cdk-lib/aws-ecs'
-import { VpcLinkProps } from './VpcProps'
+import { AppProps } from "./AppProps";
+import { PipelineWithBuildSystemProps } from "./PipelineProps";
+import { CpuArchitecture } from "aws-cdk-lib/aws-ecs";
+import { VpcLinkProps } from "./VpcProps";
 
 /**
  * Properties for the running service on EC2
@@ -60,10 +60,7 @@ interface Ec2DomainProps {
   readonly acmeEmail?: string;
 }
 
-export interface Ec2Props extends 
-  PipelineWithBuildSystemProps,
-  Ec2DomainProps,
-  AppProps,
-  VpcLinkProps {
-    readonly serviceProps?: Ec2ServiceProps;
+export interface Ec2Props
+  extends PipelineWithBuildSystemProps, Ec2DomainProps, AppProps, VpcLinkProps {
+  readonly serviceProps?: Ec2ServiceProps;
 }

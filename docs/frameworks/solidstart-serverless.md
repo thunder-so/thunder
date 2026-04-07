@@ -16,11 +16,11 @@ Reference: [Solid Start Getting Started](https://docs.solidjs.com/solid-start/ge
 Solid Start uses [Nitro](https://nitro.unjs.io/) for server-side rendering. Set the `aws-lambda` preset in `app.config.ts`:
 
 ```typescript
-import { defineConfig } from '@solidjs/start/config';
+import { defineConfig } from "@solidjs/start/config";
 
 export default defineConfig({
   server: {
-    preset: 'aws-lambda',
+    preset: "aws-lambda",
   },
 });
 ```
@@ -34,6 +34,7 @@ bun run build
 ```
 
 This generates:
+
 - `.output/server/` - Lambda handler
 - `.output/public/` - Static assets for S3
 
@@ -48,23 +49,23 @@ bun add @thunder-so/thunder --development
 Create `stack/prod.ts`:
 
 ```typescript
-import { Cdk, SolidStart, type SolidStartProps } from '@thunder-so/thunder';
+import { Cdk, SolidStart, type SolidStartProps } from "@thunder-so/thunder";
 
 const config: SolidStartProps = {
   env: {
-    account: '123456789012',
-    region: 'us-east-1',
+    account: "123456789012",
+    region: "us-east-1",
   },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
 };
 
 new SolidStart(
   new Cdk.App(),
   `${config.application}-${config.service}-${config.environment}-stack`,
-  config
+  config,
 );
 ```
 
@@ -79,10 +80,12 @@ npx cdk deploy --app "npx tsx stack/prod.ts" --profile default
 ```typescript
 const config: SolidStartProps = {
   // ...
-  domain: 'app.example.com',
-  hostedZoneId: 'Z1234567890ABC',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/abc-123',
-  regionalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/def-456',
+  domain: "app.example.com",
+  hostedZoneId: "Z1234567890ABC",
+  globalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+  regionalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/def-456",
 };
 ```
 

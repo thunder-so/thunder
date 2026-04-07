@@ -1,60 +1,60 @@
-import { FrameworkConfig, ServerlessProps } from '../../types/ServerlessProps';
+import { FrameworkConfig, ServerlessProps } from "../../types/ServerlessProps";
 
 export const FRAMEWORK_CONFIGS: Record<string, FrameworkConfig> = {
   nuxt: {
-    name: 'Nuxt',
-    defaultServerDir: '.output/server',
-    defaultClientDir: '.output/public',
-    defaultHandler: 'index.handler',
-    defaultServerPaths: ['/api/*'],
+    name: "Nuxt",
+    defaultServerDir: ".output/server",
+    defaultClientDir: ".output/public",
+    defaultHandler: "index.handler",
+    defaultServerPaths: ["/api/*"],
     requiresFallbackEdge: false,
-    nitroPreset: 'aws-lambda',
+    nitroPreset: "aws-lambda",
   },
   astro: {
-    name: 'Astro',
-    defaultServerDir: 'dist/lambda',
-    defaultClientDir: 'dist/client',
-    defaultHandler: 'entry.handler',
-    defaultServerPaths: ['/api/*'],
+    name: "Astro",
+    defaultServerDir: "dist/lambda",
+    defaultClientDir: "dist/client",
+    defaultHandler: "entry.handler",
+    defaultServerPaths: ["/api/*"],
     requiresFallbackEdge: true,
-    nitroPreset: 'aws-lambda',
+    nitroPreset: "aws-lambda",
   },
-  'tanstack-start': {
-    name: 'TanStack Start',
-    defaultServerDir: '.output/server',
-    defaultClientDir: '.output/public',
-    defaultHandler: 'index.handler',
-    defaultServerPaths: ['/api/*'],
+  "tanstack-start": {
+    name: "TanStack Start",
+    defaultServerDir: ".output/server",
+    defaultClientDir: ".output/public",
+    defaultHandler: "index.handler",
+    defaultServerPaths: ["/api/*"],
     requiresFallbackEdge: false,
-    nitroPreset: 'aws-lambda',
+    nitroPreset: "aws-lambda",
   },
   sveltekit: {
-    name: 'SvelteKit',
-    defaultServerDir: 'build',
-    defaultClientDir: 'build/client',
-    defaultHandler: 'index.handler',
-    defaultServerPaths: ['/api/*'],
+    name: "SvelteKit",
+    defaultServerDir: "build",
+    defaultClientDir: "build/client",
+    defaultHandler: "index.handler",
+    defaultServerPaths: ["/api/*"],
     requiresFallbackEdge: false,
     adapterRequired: true,
-    defaultIncludes: ['package.json'],
+    defaultIncludes: ["package.json"],
   },
-  'solid-start': {
-    name: 'Solid Start',
-    defaultServerDir: '.output/server',
-    defaultClientDir: '.output/public',
-    defaultHandler: 'index.handler',
-    defaultServerPaths: ['/api/*'],
+  "solid-start": {
+    name: "Solid Start",
+    defaultServerDir: ".output/server",
+    defaultClientDir: ".output/public",
+    defaultHandler: "index.handler",
+    defaultServerPaths: ["/api/*"],
     requiresFallbackEdge: false,
-    nitroPreset: 'aws-lambda',
+    nitroPreset: "aws-lambda",
   },
   analogjs: {
-    name: 'AnalogJS',
-    defaultServerDir: 'dist/analog/server',
-    defaultClientDir: 'dist/analog/public',
-    defaultHandler: 'index.handler',
-    defaultServerPaths: ['/api/*'],
+    name: "AnalogJS",
+    defaultServerDir: "dist/analog/server",
+    defaultClientDir: "dist/analog/public",
+    defaultHandler: "index.handler",
+    defaultServerPaths: ["/api/*"],
     requiresFallbackEdge: false,
-    nitroPreset: 'aws-lambda',
+    nitroPreset: "aws-lambda",
   },
 };
 
@@ -68,7 +68,7 @@ export function getFrameworkConfig(framework: string): FrameworkConfig {
 
 export function mergePropsWithDefaults(
   props: ServerlessProps & { framework: string },
-  config: FrameworkConfig
+  config: FrameworkConfig,
 ): ServerlessProps & { framework: string } {
   return {
     ...props,

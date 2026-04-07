@@ -26,7 +26,7 @@ Or set it in `nuxt.config.ts`:
 ```typescript
 export default defineNuxtConfig({
   nitro: {
-    preset: 'aws-lambda',
+    preset: "aws-lambda",
   },
 });
 ```
@@ -40,6 +40,7 @@ bun run build
 ```
 
 This generates:
+
 - `.output/server/` - Lambda handler
 - `.output/public/` - Static assets for S3
 
@@ -54,23 +55,23 @@ bun add @thunder-so/thunder --development
 Create `stack/prod.ts`:
 
 ```typescript
-import { Cdk, Nuxt, type NuxtProps } from '@thunder-so/thunder';
+import { Cdk, Nuxt, type NuxtProps } from "@thunder-so/thunder";
 
 const config: NuxtProps = {
   env: {
-    account: '123456789012',
-    region: 'us-east-1',
+    account: "123456789012",
+    region: "us-east-1",
   },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
 };
 
 new Nuxt(
   new Cdk.App(),
   `${config.application}-${config.service}-${config.environment}-stack`,
-  config
+  config,
 );
 ```
 
@@ -85,10 +86,12 @@ npx cdk deploy --app "npx tsx stack/prod.ts" --profile default
 ```typescript
 const config: NuxtProps = {
   // ...
-  domain: 'app.example.com',
-  hostedZoneId: 'Z1234567890ABC',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/abc-123',
-  regionalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/def-456',
+  domain: "app.example.com",
+  hostedZoneId: "Z1234567890ABC",
+  globalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+  regionalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/def-456",
 };
 ```
 

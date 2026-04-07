@@ -22,15 +22,15 @@ bun add -D @foladayo/sveltekit-adapter-lambda
 Edit `svelte.config.js`:
 
 ```javascript
-import adapter from '@foladayo/sveltekit-adapter-lambda';
+import adapter from "@foladayo/sveltekit-adapter-lambda";
 
 export default {
   kit: {
     adapter: adapter({
       precompress: false,
-      serveStatic: true,  // Required: serves prerendered pages
-    })
-  }
+      serveStatic: true, // Required: serves prerendered pages
+    }),
+  },
 };
 ```
 
@@ -43,6 +43,7 @@ bun run build
 ```
 
 This generates:
+
 - `build/` - Lambda handler (flat structure)
 - `build/client/` - Static assets for S3
 
@@ -57,23 +58,23 @@ bun add @thunder-so/thunder --development
 Create `stack/prod.ts`:
 
 ```typescript
-import { Cdk, SvelteKit, type SvelteKitProps } from '@thunder-so/thunder';
+import { Cdk, SvelteKit, type SvelteKitProps } from "@thunder-so/thunder";
 
 const config: SvelteKitProps = {
   env: {
-    account: '123456789012',
-    region: 'us-east-1',
+    account: "123456789012",
+    region: "us-east-1",
   },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
 };
 
 new SvelteKit(
   new Cdk.App(),
   `${config.application}-${config.service}-${config.environment}-stack`,
-  config
+  config,
 );
 ```
 
@@ -88,10 +89,12 @@ npx cdk deploy --app "npx tsx stack/prod.ts" --profile default
 ```typescript
 const config: SvelteKitProps = {
   // ...
-  domain: 'app.example.com',
-  hostedZoneId: 'Z1234567890ABC',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/abc-123',
-  regionalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/def-456',
+  domain: "app.example.com",
+  hostedZoneId: "Z1234567890ABC",
+  globalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+  regionalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/def-456",
 };
 ```
 

@@ -1,9 +1,10 @@
-import { Runtime, Architecture } from 'aws-cdk-lib/aws-lambda';
-import { AppProps } from './AppProps';
-import { CloudFrontProps } from './CloudFrontProps';
-import { PipelineWithRuntimeProps } from './PipelineProps';
+import { Runtime, Architecture } from "aws-cdk-lib/aws-lambda";
+import { AppProps } from "./AppProps";
+import { CloudFrontProps } from "./CloudFrontProps";
+import { PipelineWithRuntimeProps } from "./PipelineProps";
 
-export interface ServerlessProps extends AppProps, PipelineWithRuntimeProps, CloudFrontProps {
+export interface ServerlessProps
+  extends AppProps, PipelineWithRuntimeProps, CloudFrontProps {
   // Domain & DNS
   domain?: string;
   hostedZoneId?: string;
@@ -56,4 +57,4 @@ export interface FrameworkConfig {
   defaultIncludes?: string[];
 }
 
-export type { Runtime, Architecture } from 'aws-cdk-lib/aws-lambda';
+export type { Runtime, Architecture } from "aws-cdk-lib/aws-lambda";

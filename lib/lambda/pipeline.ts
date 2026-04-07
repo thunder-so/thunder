@@ -1,12 +1,32 @@
-import path from 'path';
+import path from "path";
 import { Construct } from "constructs";
 import { Duration, SecretValue, CfnOutput, RemovalPolicy } from "aws-cdk-lib";
 import { Pipeline, Artifact, PipelineType } from "aws-cdk-lib/aws-codepipeline";
-import { GitHubSourceAction, GitHubTrigger, CodeBuildAction } from "aws-cdk-lib/aws-codepipeline-actions";
-import { PipelineProject, LinuxArmBuildImage, LinuxBuildImage, ComputeType, BuildSpec, BuildEnvironmentVariable, BuildEnvironmentVariableType } from "aws-cdk-lib/aws-codebuild";
-import { Bucket, BucketEncryption, BlockPublicAccess, ObjectOwnership } from "aws-cdk-lib/aws-s3";
+import {
+  GitHubSourceAction,
+  GitHubTrigger,
+  CodeBuildAction,
+} from "aws-cdk-lib/aws-codepipeline-actions";
+import {
+  PipelineProject,
+  LinuxArmBuildImage,
+  LinuxBuildImage,
+  ComputeType,
+  BuildSpec,
+  BuildEnvironmentVariable,
+  BuildEnvironmentVariableType,
+} from "aws-cdk-lib/aws-codebuild";
+import {
+  Bucket,
+  BucketEncryption,
+  BlockPublicAccess,
+  ObjectOwnership,
+} from "aws-cdk-lib/aws-s3";
 import { PolicyStatement, Effect, ServicePrincipal } from "aws-cdk-lib/aws-iam";
-import { Function as LambdaFunction, Architecture } from "aws-cdk-lib/aws-lambda";
+import {
+  Function as LambdaFunction,
+  Architecture,
+} from "aws-cdk-lib/aws-lambda";
 import { DockerImageAsset } from "aws-cdk-lib/aws-ecr-assets";
 import { Repository } from "aws-cdk-lib/aws-ecr";
 import { LambdaProps } from "../../types/LambdaProps";
@@ -29,33 +49,37 @@ export class PipelineConstruct extends Construct {
   constructor(scope: Construct, id: string, props: LambdaPipelineProps) {
     super(scope, id);
 
-    this.resourceIdPrefix = getResourceIdPrefix(props.application, props.service, props.environment);
+    this.resourceIdPrefix = getResourceIdPrefix(
+      props.application,
+      props.service,
+      props.environment,
+    );
 
     // Sanitize paths to ensure valid unix directory paths
     const sanitizePath = (path: string | undefined): string => {
-      if (!path || path === '.' || path === './') return '';
+      if (!path || path === "." || path === "./") return "";
       // Remove leading/trailing slashes and normalize multiple slashes
-      return path.replace(/^\/+|\/+$/g, '').replace(/\/+/g, '/');
+      return path.replace(/^\/+|\/+$/g, "").replace(/\/+/g, "/");
     };
 
     this.rootDir = sanitizePath(props?.rootDir);
     this.codeDir = sanitizePath(props?.functionProps?.codeDir);
-    
+
     // Container build is enabled when a Dockerfile path is provided on the function props
     const isContainerBuild = !!props.functionProps?.dockerFile;
-    
+
     // Create custom runtime
     if (props.buildProps?.customRuntime) {
-      const dockerAsset = new DockerImageAsset(this, 'RuntimeImage', {
+      const dockerAsset = new DockerImageAsset(this, "RuntimeImage", {
         directory: path.dirname(props.buildProps.customRuntime),
         file: path.basename(props.buildProps.customRuntime),
         buildArgs: {
-          NODE_VERSION: props.buildProps?.runtime_version as string || '24'
-        }
+          NODE_VERSION: (props.buildProps?.runtime_version as string) || "24",
+        },
       });
       this.customRuntimeImageUri = dockerAsset.imageUri;
     }
-    
+
     if (isContainerBuild) {
       // create container pipeline
       this.codePipeline = this.createContainerPipeline(props);
@@ -65,9 +89,9 @@ export class PipelineConstruct extends Construct {
       // create pipeline
       this.codePipeline = this.createPipeline(props);
     }
-  
+
     // Create a rule to capture execution events and dispatch to event bus
-    new EventsConstruct(this, 'Events', {
+    new EventsConstruct(this, "Events", {
       ...props,
       codePipeline: this.codePipeline,
     });
@@ -79,7 +103,6 @@ export class PipelineConstruct extends Construct {
       exportName: `${this.resourceIdPrefix}-CodePipelineName`,
     });
   }
-
 
   /**
    * Create a CodePipeline for Docker-based Lambda deployment.
@@ -118,11 +141,8 @@ export class PipelineConstruct extends Construct {
       new PolicyStatement({
         effect: Effect.ALLOW,
         principals: [new ServicePrincipal("lambda.amazonaws.com")],
-        actions: [
-          "ecr:BatchGetImage",
-          "ecr:GetDownloadUrlForLayer"
-        ],
-      })
+        actions: ["ecr:BatchGetImage", "ecr:GetDownloadUrlForLayer"],
+      }),
     );
 
     // Grant the Lambda function the right to pull images from ECR (all necessary permissions)
@@ -156,12 +176,15 @@ export class PipelineConstruct extends Construct {
           },
         },
         artifacts: {
-          files: [this.rootDir ? `${this.rootDir}/imageUri.txt` : "imageUri.txt"],
+          files: [
+            this.rootDir ? `${this.rootDir}/imageUri.txt` : "imageUri.txt",
+          ],
         },
       }),
       environment: {
-        buildImage: props.functionProps?.architecture === Architecture.ARM_64 
-            ? LinuxArmBuildImage.AMAZON_LINUX_2_STANDARD_3_0 
+        buildImage:
+          props.functionProps?.architecture === Architecture.ARM_64
+            ? LinuxArmBuildImage.AMAZON_LINUX_2_STANDARD_3_0
             : LinuxBuildImage.STANDARD_7_0,
         computeType: ComputeType.SMALL,
         privileged: true,
@@ -169,17 +192,25 @@ export class PipelineConstruct extends Construct {
       environmentVariables: {
         ECR_REPO: { value: props.repository.repositoryUri },
         ...(props.buildProps?.environment
-          ? Object.entries(Object.assign({}, ...(props.buildProps.environment))).reduce(
-              (acc, [key, value]) => ({ ...acc, [key]: { value, type: BuildEnvironmentVariableType.PLAINTEXT } }),
-              {}
+          ? Object.entries(
+              Object.assign({}, ...props.buildProps.environment),
+            ).reduce(
+              (acc, [key, value]) => ({
+                ...acc,
+                [key]: { value, type: BuildEnvironmentVariableType.PLAINTEXT },
+              }),
+              {},
             )
           : {}),
         ...(props.buildProps?.secrets
           ? Object.fromEntries(
               props.buildProps.secrets.map(({ key, resource }) => [
                 key,
-                { value: resource, type: BuildEnvironmentVariableType.PARAMETER_STORE },
-              ])
+                {
+                  value: resource,
+                  type: BuildEnvironmentVariableType.PARAMETER_STORE,
+                },
+              ]),
             )
           : {}),
       },
@@ -198,15 +229,17 @@ export class PipelineConstruct extends Construct {
             "ecr:GetAuthorizationToken",
             "ecr:BatchCheckLayerAvailability",
             "ecr:GetDownloadUrlForLayer",
-            "ecr:BatchGetImage"
+            "ecr:BatchGetImage",
           ],
-          resources: ["*"]
-        })
+          resources: ["*"],
+        }),
       );
     }
 
     // Deploy Action: Update Lambda function with new image
-    const imageUriPath = this.rootDir ? `${this.rootDir}/imageUri.txt` : 'imageUri.txt';
+    const imageUriPath = this.rootDir
+      ? `${this.rootDir}/imageUri.txt`
+      : "imageUri.txt";
     const deployProject = new PipelineProject(this, "DockerDeployProject", {
       projectName: `${this.resourceIdPrefix}-lambda-docker-deploy`,
       buildSpec: BuildSpec.fromObject({
@@ -232,9 +265,10 @@ export class PipelineConstruct extends Construct {
         },
       }),
       environment: {
-        buildImage: props.functionProps?.architecture === Architecture.ARM_64 
-          ? LinuxArmBuildImage.AMAZON_LINUX_2_STANDARD_3_0 
-          : LinuxBuildImage.STANDARD_7_0,
+        buildImage:
+          props.functionProps?.architecture === Architecture.ARM_64
+            ? LinuxArmBuildImage.AMAZON_LINUX_2_STANDARD_3_0
+            : LinuxBuildImage.STANDARD_7_0,
         computeType: ComputeType.SMALL,
       },
       environmentVariables: {
@@ -249,7 +283,7 @@ export class PipelineConstruct extends Construct {
         effect: Effect.ALLOW,
         actions: ["lambda:UpdateFunctionCode"],
         resources: [props.lambdaFunction.functionArn],
-      })
+      }),
     );
 
     // Enhanced permissions for deploy project
@@ -262,19 +296,16 @@ export class PipelineConstruct extends Construct {
           "lambda:GetFunctionConfiguration",
         ],
         resources: [props.lambdaFunction.functionArn],
-      })
+      }),
     );
 
     // Grant ECR describe permissions
     deployProject.addToRolePolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
-        actions: [
-          "ecr:DescribeImages",
-          "ecr:DescribeRepositories",
-        ],
+        actions: ["ecr:DescribeImages", "ecr:DescribeRepositories"],
         resources: [props.repository.repositoryArn],
-      })
+      }),
     );
 
     // Build Action
@@ -317,7 +348,7 @@ export class PipelineConstruct extends Construct {
 
   /**
    * Create CodeBuild Project
-   * @param props 
+   * @param props
    * @returns project
    */
   private createCodeBuild(props: LambdaPipelineProps): PipelineProject {
@@ -325,37 +356,40 @@ export class PipelineConstruct extends Construct {
     const buildSpec = BuildSpec.fromObject({
       version: "0.2",
       phases: {
-        install: props.buildProps?.customRuntime ? {
-          commands: [
-            'echo "Starting build with custom runtime"',
-            ...(this.rootDir ? [`cd ${this.rootDir}`] : []),
-            'echo "Installing dependencies..."',
-            props.buildProps?.installcmd || 'npm install',
-            'echo "Install phase complete"'
-          ]
-        } : {
-          "runtime-versions": {
-            [props.buildProps?.runtime || "nodejs"]: props.buildProps?.runtime_version || "24",
-          },
-          commands: [
-            ...(this.rootDir ? [`cd ${this.rootDir}`] : []),
-            props.buildProps?.installcmd || "npm install"
-          ],
-        },
+        install: props.buildProps?.customRuntime
+          ? {
+              commands: [
+                'echo "Starting build with custom runtime"',
+                ...(this.rootDir ? [`cd ${this.rootDir}`] : []),
+                'echo "Installing dependencies..."',
+                props.buildProps?.installcmd || "npm install",
+                'echo "Install phase complete"',
+              ],
+            }
+          : {
+              "runtime-versions": {
+                [props.buildProps?.runtime || "nodejs"]:
+                  props.buildProps?.runtime_version || "24",
+              },
+              commands: [
+                ...(this.rootDir ? [`cd ${this.rootDir}`] : []),
+                props.buildProps?.installcmd || "npm install",
+              ],
+            },
         build: {
           commands: [
             'echo "Starting build phase"',
-            props.buildProps?.buildcmd || 'npm run build',
-            'echo "Build phase complete"'
+            props.buildProps?.buildcmd || "npm run build",
+            'echo "Build phase complete"',
           ],
         },
         post_build: {
           commands: [
-            `echo "Zipping code from directory: ${this.codeDir || '.'}"`,
-            `cd ${this.codeDir || '.'}`,
+            `echo "Zipping code from directory: ${this.codeDir || "."}"`,
+            `cd ${this.codeDir || "."}`,
             `zip -r $CODEBUILD_SRC_DIR/function.zip . -x "*.git*" "node_modules/.cache/*" "*.log"`,
-            'cd $CODEBUILD_SRC_DIR',
-            'ls -la function.zip'
+            "cd $CODEBUILD_SRC_DIR",
+            "ls -la function.zip",
           ],
         },
       },
@@ -365,24 +399,30 @@ export class PipelineConstruct extends Construct {
     });
 
     // Build Environment Variables
-    const buildEnvironmentVariables: Record<string, BuildEnvironmentVariable> = {
-      ...(props.buildProps?.environment
-        ? Object.fromEntries(
-            Object.entries(Object.assign({}, ...(props.buildProps.environment))).map(([key, value]) => [
-              key,
-              { value, type: BuildEnvironmentVariableType.PLAINTEXT },
-            ])
-          )
-        : {}),
-      ...(props.buildProps?.secrets
-        ? Object.fromEntries(
-            props.buildProps.secrets.map(({ key, resource }) => [
-              key,
-              { value: resource, type: BuildEnvironmentVariableType.PARAMETER_STORE },
-            ])
-          )
-        : {}),
-    };
+    const buildEnvironmentVariables: Record<string, BuildEnvironmentVariable> =
+      {
+        ...(props.buildProps?.environment
+          ? Object.fromEntries(
+              Object.entries(
+                Object.assign({}, ...props.buildProps.environment),
+              ).map(([key, value]) => [
+                key,
+                { value, type: BuildEnvironmentVariableType.PLAINTEXT },
+              ]),
+            )
+          : {}),
+        ...(props.buildProps?.secrets
+          ? Object.fromEntries(
+              props.buildProps.secrets.map(({ key, resource }) => [
+                key,
+                {
+                  value: resource,
+                  type: BuildEnvironmentVariableType.PARAMETER_STORE,
+                },
+              ]),
+            )
+          : {}),
+      };
 
     // Build Action (CodeBuild)
     const buildProject = new PipelineProject(this, "LambdaBuildProject", {
@@ -391,8 +431,8 @@ export class PipelineConstruct extends Construct {
       environment: {
         buildImage: this.customRuntimeImageUri
           ? LinuxBuildImage.fromDockerRegistry(this.customRuntimeImageUri)
-          : props.functionProps?.architecture === Architecture.ARM_64 
-            ? LinuxArmBuildImage.AMAZON_LINUX_2_STANDARD_3_0 
+          : props.functionProps?.architecture === Architecture.ARM_64
+            ? LinuxArmBuildImage.AMAZON_LINUX_2_STANDARD_3_0
             : LinuxBuildImage.STANDARD_7_0,
         computeType: ComputeType.MEDIUM,
         privileged: this.customRuntimeImageUri ? true : false,
@@ -407,7 +447,7 @@ export class PipelineConstruct extends Construct {
         effect: Effect.ALLOW,
         actions: ["lambda:UpdateFunctionCode"],
         resources: [props.lambdaFunction.functionArn],
-      })
+      }),
     );
 
     // Allow CodeBuild to get secrets if needed
@@ -416,7 +456,7 @@ export class PipelineConstruct extends Construct {
         effect: Effect.ALLOW,
         actions: ["secretsmanager:GetSecretValue"],
         resources: [props.accessTokenSecretArn!],
-      })
+      }),
     );
 
     // Allow project to pull custom runtime image from ECR if using custom runtime
@@ -428,10 +468,10 @@ export class PipelineConstruct extends Construct {
             "ecr:GetAuthorizationToken",
             "ecr:BatchCheckLayerAvailability",
             "ecr:GetDownloadUrlForLayer",
-            "ecr:BatchGetImage"
+            "ecr:BatchGetImage",
           ],
-          resources: ["*"]
-        })
+          resources: ["*"],
+        }),
       );
     }
 
@@ -440,7 +480,7 @@ export class PipelineConstruct extends Construct {
 
   /**
    * Create the CodePipeline
-   * @param props 
+   * @param props
    * @returns pipeline
    */
   private createPipeline(props: LambdaPipelineProps): Pipeline {
@@ -486,15 +526,16 @@ export class PipelineConstruct extends Construct {
         phases: {
           build: {
             commands: [
-              'aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --zip-file fileb://function.zip',
+              "aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --zip-file fileb://function.zip",
             ],
           },
         },
       }),
       environment: {
-        buildImage: props.functionProps?.architecture === Architecture.ARM_64 
-          ? LinuxArmBuildImage.AMAZON_LINUX_2_STANDARD_3_0 
-          : LinuxBuildImage.STANDARD_7_0,
+        buildImage:
+          props.functionProps?.architecture === Architecture.ARM_64
+            ? LinuxArmBuildImage.AMAZON_LINUX_2_STANDARD_3_0
+            : LinuxBuildImage.STANDARD_7_0,
         computeType: ComputeType.SMALL,
       },
       environmentVariables: {
@@ -509,7 +550,7 @@ export class PipelineConstruct extends Construct {
         effect: Effect.ALLOW,
         actions: ["lambda:UpdateFunctionCode"],
         resources: [props.lambdaFunction.functionArn],
-      })
+      }),
     );
 
     // Deploy Action

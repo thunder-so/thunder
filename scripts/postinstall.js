@@ -9,13 +9,13 @@
  * Location: .claude/skills/<skill-name>/SKILL.md (project-level skill)
  */
 
-'use strict';
+"use strict";
 
-const fs   = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const SKILL_NAME = 'aws-deploy';
-const SKILL_SRC  = path.join(__dirname, '..', '.claude', 'skills', SKILL_NAME);
+const SKILL_NAME = "aws-deploy";
+const SKILL_SRC = path.join(__dirname, "..", ".claude", "skills", SKILL_NAME);
 
 // Walk up from node_modules to find the actual project root
 const PROJECT_ROOT = findProjectRoot(__dirname);
@@ -25,7 +25,7 @@ if (!PROJECT_ROOT) {
   process.exit(0);
 }
 
-const SKILL_DEST = path.join(PROJECT_ROOT, '.claude', 'skills', SKILL_NAME);
+const SKILL_DEST = path.join(PROJECT_ROOT, ".claude", "skills", SKILL_NAME);
 
 // Only install if:
 // 1. The source skill directory exists (sanity check)
@@ -36,12 +36,12 @@ if (!fs.existsSync(SKILL_SRC)) {
 }
 
 // Don't overwrite if skill is already at the same version
-const destSkillMd = path.join(SKILL_DEST, 'SKILL.md');
-const srcSkillMd  = path.join(SKILL_SRC,  'SKILL.md');
+const destSkillMd = path.join(SKILL_DEST, "SKILL.md");
+const srcSkillMd = path.join(SKILL_SRC, "SKILL.md");
 
 if (fs.existsSync(destSkillMd)) {
-  const srcContent  = fs.readFileSync(srcSkillMd,  'utf8');
-  const destContent = fs.readFileSync(destSkillMd, 'utf8');
+  const srcContent = fs.readFileSync(srcSkillMd, "utf8");
+  const destContent = fs.readFileSync(destSkillMd, "utf8");
   if (srcContent === destContent) {
     // Already up to date
     process.exit(0);
@@ -61,7 +61,7 @@ try {
 function copyDir(src, dest) {
   fs.mkdirSync(dest, { recursive: true });
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
-    const srcPath  = path.join(src,  entry.name);
+    const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
     if (entry.isDirectory()) {
       copyDir(srcPath, destPath);
@@ -78,8 +78,8 @@ function findProjectRoot(startDir) {
     const parent = path.dirname(dir);
     if (parent === dir) break;
     dir = parent;
-    if (dir.includes('node_modules')) continue;
-    if (fs.existsSync(path.join(dir, 'package.json'))) {
+    if (dir.includes("node_modules")) continue;
+    if (fs.existsSync(path.join(dir, "package.json"))) {
       return dir;
     }
   }

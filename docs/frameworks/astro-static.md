@@ -10,6 +10,7 @@ cd my-astro-site
 ```
 
 When prompted:
+
 - Template: Choose any (e.g., "Empty", "Blog", "Portfolio")
 - TypeScript: Yes (recommended)
 - Install dependencies: Yes
@@ -22,10 +23,10 @@ Reference: [Astro Installation Docs](https://docs.astro.build/en/install-and-set
 Edit `astro.config.mjs`:
 
 ```javascript
-import { defineConfig } from 'astro/config';
+import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  output: 'static',  // Default, but explicit is better
+  output: "static", // Default, but explicit is better
 });
 ```
 
@@ -50,24 +51,24 @@ bun add @thunder-so/thunder --development
 Create `stack/prod.ts`:
 
 ```typescript
-import { Cdk, Static, type StaticProps } from '@thunder-so/thunder';
+import { Cdk, Static, type StaticProps } from "@thunder-so/thunder";
 
 const config: StaticProps = {
   env: {
-    account: '123456789012',
-    region: 'us-east-1',
+    account: "123456789012",
+    region: "us-east-1",
   },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
-  outputDir: 'dist',
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
+  outputDir: "dist",
 };
 
 new Static(
   new Cdk.App(),
   `${config.application}-${config.service}-${config.environment}-stack`,
-  config
+  config,
 );
 ```
 
@@ -82,9 +83,10 @@ npx cdk deploy --app "npx tsx stack/prod.ts" --profile default
 ```typescript
 const config: StaticProps = {
   // ...
-  domain: 'site.example.com',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/abc-123',
-  hostedZoneId: 'Z1234567890ABC',
+  domain: "site.example.com",
+  globalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+  hostedZoneId: "Z1234567890ABC",
 };
 ```
 
@@ -93,12 +95,8 @@ const config: StaticProps = {
 ```typescript
 const config: StaticProps = {
   // ...
-  redirects: [
-    { source: '/old-page', destination: '/new-page' },
-  ],
-  rewrites: [
-    { source: '/blog/*', destination: '/posts/*' },
-  ],
+  redirects: [{ source: "/old-page", destination: "/new-page" }],
+  rewrites: [{ source: "/blog/*", destination: "/posts/*" }],
 };
 ```
 

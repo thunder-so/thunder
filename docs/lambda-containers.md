@@ -7,6 +7,7 @@ Use container Lambda when:
 - Your deployment package exceeds the 250 MB zip limit
 - You need a runtime not natively supported by Lambda (e.g. Bun)
 - You want to use system-level dependencies (native modules, binaries)
+
 ## Node.js Container Image
 
 ### 1. Create a Dockerfile
@@ -32,24 +33,24 @@ CMD ["index.handler"]
 ### 2. Stack File
 
 ```typescript
-import { Cdk, Lambda, type LambdaProps } from '@thunder-so/thunder';
+import { Cdk, Lambda, type LambdaProps } from "@thunder-so/thunder";
 
 const config: LambdaProps = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'api',
-  environment: 'prod',
-  rootDir: '.',
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "api",
+  environment: "prod",
+  rootDir: ".",
 
   functionProps: {
-    dockerFile: 'Dockerfile',   // path relative to rootDir
+    dockerFile: "Dockerfile", // path relative to rootDir
     memorySize: 1792,
     timeout: 10,
-    variables: [{ NODE_ENV: 'production' }],
+    variables: [{ NODE_ENV: "production" }],
   },
 };
 
-new Lambda(new Cdk.App(), 'myapp-api-prod-stack', config);
+new Lambda(new Cdk.App(), "myapp-api-prod-stack", config);
 ```
 
 > When `dockerFile` is set, `runtime`, `architecture`, `codeDir`, `handler`, `include`, and `exclude` are ignored - the Dockerfile controls the build entirely.
@@ -97,7 +98,7 @@ Bun's Lambda runtime expects a `fetch`-compatible handler:
 
 ```javascript
 // lambda-bun.js
-const { handler } = require('./index.js');
+const { handler } = require("./index.js");
 exports.fetch = handler;
 ```
 
@@ -105,35 +106,35 @@ If you're using [Hono](https://hono.dev/) with Bun:
 
 ```typescript
 // src/index.ts
-import { Hono } from 'hono';
+import { Hono } from "hono";
 
 const app = new Hono();
-app.get('/', (c) => c.json({ ok: true }));
+app.get("/", (c) => c.json({ ok: true }));
 
-export default app;  // Bun's fetch handler
+export default app; // Bun's fetch handler
 ```
 
 ### 3. Stack File
 
 ```typescript
-import { Cdk, Lambda, type LambdaProps } from '@thunder-so/thunder';
+import { Cdk, Lambda, type LambdaProps } from "@thunder-so/thunder";
 
 const config: LambdaProps = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'api',
-  environment: 'prod',
-  rootDir: '.',
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "api",
+  environment: "prod",
+  rootDir: ".",
 
   functionProps: {
-    dockerFile: 'Dockerfile.bun',
+    dockerFile: "Dockerfile.bun",
     memorySize: 512,
     timeout: 10,
     keepWarm: true,
   },
 };
 
-new Lambda(new Cdk.App(), 'myapp-api-prod-stack', config);
+new Lambda(new Cdk.App(), "myapp-api-prod-stack", config);
 ```
 
 ## Docker Build Arguments
@@ -148,6 +149,7 @@ functionProps: {
 ```
 
 In your Dockerfile:
+
 ```dockerfile
 ARG NODE_ENV
 ARG APP_VERSION

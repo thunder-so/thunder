@@ -18,16 +18,16 @@ export async function fetchTemplate(slug: string): Promise<FetchResult> {
   console.log(`[fetch] Downloading Coolify template: ${url}`);
 
   const raw = await httpsGet(url);
-  
+
   // Extract port from comment: # port: 8096
   const portMatch = /^#\s*port:\s*(\d+)/m.exec(raw);
   const port = portMatch ? parseInt(portMatch[1], 10) : undefined;
-  
+
   const parsed = parse(raw);
 
   if (!parsed || typeof parsed !== "object") {
     throw new Error(
-      `[fetch] Template "${slug}" did not parse to a valid YAML object.`
+      `[fetch] Template "${slug}" did not parse to a valid YAML object.`,
     );
   }
 
@@ -50,8 +50,8 @@ function httpsGet(url: string): Promise<string> {
       if (res.statusCode !== 200) {
         reject(
           new Error(
-            `[fetch] HTTP ${res.statusCode} fetching template from ${url}`
-          )
+            `[fetch] HTTP ${res.statusCode} fetching template from ${url}`,
+          ),
         );
         return;
       }

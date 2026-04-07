@@ -16,14 +16,14 @@ Reference: [AnalogJS Getting Started](https://analogjs.org/docs/getting-started)
 AnalogJS uses [Nitro](https://nitro.unjs.io/) for server-side rendering. Set the `aws-lambda` preset in `vite.config.ts`:
 
 ```typescript
-import { defineConfig } from 'vite';
-import analog from '@analogjs/platform';
+import { defineConfig } from "vite";
+import analog from "@analogjs/platform";
 
 export default defineConfig({
   plugins: [
     analog({
       nitro: {
-        preset: 'aws-lambda',
+        preset: "aws-lambda",
       },
     }),
   ],
@@ -39,6 +39,7 @@ bun run build
 ```
 
 This generates:
+
 - `dist/analog/server/` - Lambda handler
 - `dist/analog/public/` - Static assets for S3
 
@@ -53,23 +54,23 @@ bun add @thunder-so/thunder --development
 Create `stack/prod.ts`:
 
 ```typescript
-import { Cdk, AnalogJS, type AnalogJSProps } from '@thunder-so/thunder';
+import { Cdk, AnalogJS, type AnalogJSProps } from "@thunder-so/thunder";
 
 const config: AnalogJSProps = {
   env: {
-    account: '123456789012',
-    region: 'us-east-1',
+    account: "123456789012",
+    region: "us-east-1",
   },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
 };
 
 new AnalogJS(
   new Cdk.App(),
   `${config.application}-${config.service}-${config.environment}-stack`,
-  config
+  config,
 );
 ```
 
@@ -84,10 +85,12 @@ npx cdk deploy --app "npx tsx stack/prod.ts" --profile default
 ```typescript
 const config: AnalogJSProps = {
   // ...
-  domain: 'app.example.com',
-  hostedZoneId: 'Z1234567890ABC',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/abc-123',
-  regionalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/def-456',
+  domain: "app.example.com",
+  hostedZoneId: "Z1234567890ABC",
+  globalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+  regionalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/def-456",
 };
 ```
 

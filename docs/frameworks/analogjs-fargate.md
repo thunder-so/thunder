@@ -48,33 +48,33 @@ bun add @thunder-so/thunder --development
 Create `stack/prod.ts`:
 
 ```typescript
-import { Cdk, Fargate, type FargateProps } from '@thunder-so/thunder';
+import { Cdk, Fargate, type FargateProps } from "@thunder-so/thunder";
 
 const config: FargateProps = {
   env: {
-    account: '123456789012',
-    region: 'us-east-1',
+    account: "123456789012",
+    region: "us-east-1",
   },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
 
   serviceProps: {
-    dockerFile: 'Dockerfile',
+    dockerFile: "Dockerfile",
     architecture: Cdk.aws_ecs.CpuArchitecture.ARM64,
     cpu: 512,
     memorySize: 1024,
     port: 3000,
     desiredCount: 1,
-    healthCheckPath: '/',
+    healthCheckPath: "/",
   },
 };
 
 new Fargate(
   new Cdk.App(),
   `${config.application}-${config.service}-${config.environment}-stack`,
-  config
+  config,
 );
 ```
 
@@ -89,9 +89,10 @@ npx cdk deploy --app "npx tsx stack/prod.ts" --profile default
 ```typescript
 const config: FargateProps = {
   // ...
-  domain: 'app.example.com',
-  regionalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/abc-123',
-  hostedZoneId: 'Z1234567890ABC',
+  domain: "app.example.com",
+  regionalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+  hostedZoneId: "Z1234567890ABC",
 };
 ```
 

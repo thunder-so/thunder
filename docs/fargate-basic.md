@@ -6,15 +6,15 @@ Works with any language or framework you can containerize: Next.js, Express, Nes
 
 ## AWS Resources
 
-| Resource | Purpose |
-|---|---|
-| [ECS Cluster](https://aws.amazon.com/ecs/) | Container orchestration |
-| [Fargate Task](https://aws.amazon.com/fargate/) | Serverless container runtime |
-| [Application Load Balancer](https://aws.amazon.com/elasticloadbalancing/) | Public HTTP/HTTPS endpoint, health checks |
-| [VPC](https://aws.amazon.com/vpc/) | Network isolation (created automatically if not provided) |
-| [CloudWatch Logs](https://aws.amazon.com/cloudwatch/) | Container logs, retained for 1 week |
-| [ACM Certificate](https://aws.amazon.com/certificate-manager/) | SSL for custom domain (optional) |
-| [Route53](https://aws.amazon.com/route53/) | DNS A record (optional) |
+| Resource                                                                  | Purpose                                                   |
+| ------------------------------------------------------------------------- | --------------------------------------------------------- |
+| [ECS Cluster](https://aws.amazon.com/ecs/)                                | Container orchestration                                   |
+| [Fargate Task](https://aws.amazon.com/fargate/)                           | Serverless container runtime                              |
+| [Application Load Balancer](https://aws.amazon.com/elasticloadbalancing/) | Public HTTP/HTTPS endpoint, health checks                 |
+| [VPC](https://aws.amazon.com/vpc/)                                        | Network isolation (created automatically if not provided) |
+| [CloudWatch Logs](https://aws.amazon.com/cloudwatch/)                     | Container logs, retained for 1 week                       |
+| [ACM Certificate](https://aws.amazon.com/certificate-manager/)            | SSL for custom domain (optional)                          |
+| [Route53](https://aws.amazon.com/route53/)                                | DNS A record (optional)                                   |
 
 ## Prerequisites
 
@@ -71,34 +71,34 @@ stack
 ## Stack File
 
 ```typescript
-import { Cdk, Fargate, type FargateProps } from '@thunder-so/thunder';
+import { Cdk, Fargate, type FargateProps } from "@thunder-so/thunder";
 
 const config: FargateProps = {
   env: {
-    account: '123456789012',
-    region: 'us-east-1',
+    account: "123456789012",
+    region: "us-east-1",
   },
-  application: 'myapp',
-  service: 'api',
-  environment: 'dev',
+  application: "myapp",
+  service: "api",
+  environment: "dev",
 
-  rootDir: '.',
+  rootDir: ".",
 
   serviceProps: {
-    dockerFile: 'Dockerfile',
+    dockerFile: "Dockerfile",
     architecture: Cdk.aws_ecs.CpuArchitecture.ARM64,
-    cpu: 256,        // 0.25 vCPU
+    cpu: 256, // 0.25 vCPU
     memorySize: 512, // 512 MB
     port: 3000,
     desiredCount: 1,
-    healthCheckPath: '/health',
+    healthCheckPath: "/health",
   },
 };
 
 new Fargate(
   new Cdk.App(),
   `${config.application}-${config.service}-${config.environment}-stack`,
-  config
+  config,
 );
 ```
 
@@ -123,13 +123,15 @@ myapp-api-dev-stack.LoadBalancerDNS = myapp-api-dev-1234567890.us-east-1.elb.ama
 ```typescript
 const config: FargateProps = {
   // ...
-  domain: 'api.example.com',
-  regionalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/abc-123',
-  hostedZoneId: 'Z1234567890ABC',
+  domain: "api.example.com",
+  regionalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+  hostedZoneId: "Z1234567890ABC",
 };
 ```
 
 When a domain is configured:
+
 - HTTPS listener is added on port 443
 - HTTP on port 80 redirects to HTTPS
 - Route53 A record is created pointing to the ALB
@@ -182,33 +184,33 @@ Your app should return `200 OK` on that path within 5 seconds.
 Fargate uses [fixed CPU/memory combinations](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html):
 
 | CPU (units) | vCPU | Valid Memory (MB) |
-|---|---|---|
-| 256 | 0.25 | 512, 1024, 2048 |
-| 512 | 0.5 | 1024–4096 |
-| 1024 | 1 | 2048–8192 |
-| 2048 | 2 | 4096–16384 |
-| 4096 | 4 | 8192–30720 |
+| ----------- | ---- | ----------------- |
+| 256         | 0.25 | 512, 1024, 2048   |
+| 512         | 0.5  | 1024–4096         |
+| 1024        | 1    | 2048–8192         |
+| 2048        | 2    | 4096–16384        |
+| 4096        | 4    | 8192–30720        |
 
 ## Estimated Cost
 
 A minimal deployment (1 task, `us-east-1`, no free tier):
 
-| Component | Monthly |
-|---|---|
-| Fargate (1 task, 0.25 vCPU / 512 MB) | ~$9 |
-| Application Load Balancer | ~$22 |
-| CloudWatch Logs | <$1 |
-| Route53 | $0.50 |
-| **Total** | **~$33/month** |
+| Component                            | Monthly        |
+| ------------------------------------ | -------------- |
+| Fargate (1 task, 0.25 vCPU / 512 MB) | ~$9            |
+| Application Load Balancer            | ~$22           |
+| CloudWatch Logs                      | <$1            |
+| Route53                              | $0.50          |
+| **Total**                            | **~$33/month** |
 
 See [Fargate pricing](https://aws.amazon.com/fargate/pricing/) and [ALB pricing](https://aws.amazon.com/elasticloadbalancing/pricing/).
 
 ## Stack Outputs
 
-| Output | Description |
-|---|---|
-| `LoadBalancerDNS` | ALB DNS name |
-| `Route53Domain` | Custom domain URL (only if domain is configured) |
+| Output            | Description                                      |
+| ----------------- | ------------------------------------------------ |
+| `LoadBalancerDNS` | ALB DNS name                                     |
+| `Route53Domain`   | Custom domain URL (only if domain is configured) |
 
 ## Destroy
 

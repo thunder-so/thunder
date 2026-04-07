@@ -6,13 +6,13 @@ Works with any framework that exports a Lambda handler: [Express.js](https://exp
 
 ## AWS Resources
 
-| Resource | Purpose |
-|---|---|
-| [Lambda Function](https://aws.amazon.com/lambda/) | Runs your server code |
-| [API Gateway HTTP API](https://aws.amazon.com/api-gateway/) | Public HTTP endpoint, routes all traffic to Lambda |
-| [CloudWatch Logs](https://aws.amazon.com/cloudwatch/) | Function logs, retained for 1 month |
-| [ACM Certificate](https://aws.amazon.com/certificate-manager/) | SSL for custom domain (optional) |
-| [Route53](https://aws.amazon.com/route53/) | DNS A + AAAA records (optional) |
+| Resource                                                       | Purpose                                            |
+| -------------------------------------------------------------- | -------------------------------------------------- |
+| [Lambda Function](https://aws.amazon.com/lambda/)              | Runs your server code                              |
+| [API Gateway HTTP API](https://aws.amazon.com/api-gateway/)    | Public HTTP endpoint, routes all traffic to Lambda |
+| [CloudWatch Logs](https://aws.amazon.com/cloudwatch/)          | Function logs, retained for 1 month                |
+| [ACM Certificate](https://aws.amazon.com/certificate-manager/) | SSL for custom domain (optional)                   |
+| [Route53](https://aws.amazon.com/route53/)                     | DNS A + AAAA records (optional)                    |
 
 ## Prerequisites
 
@@ -40,7 +40,7 @@ Your Lambda handler must follow the [AWS Lambda handler signature](https://docs.
 export const handler = async (event: any) => {
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: 'Hello from Lambda' }),
+    body: JSON.stringify({ message: "Hello from Lambda" }),
   };
 };
 ```
@@ -49,11 +49,11 @@ For Express/Hono/Fastify, use an adapter like [`@hono/node-server`](https://hono
 
 ```typescript
 // src/index.ts (Hono example)
-import { Hono } from 'hono';
-import { handle } from 'hono/aws-lambda';
+import { Hono } from "hono";
+import { handle } from "hono/aws-lambda";
 
 const app = new Hono();
-app.get('/', (c) => c.json({ message: 'Hello' }));
+app.get("/", (c) => c.json({ message: "Hello" }));
 
 export const handler = handle(app);
 ```
@@ -61,24 +61,24 @@ export const handler = handle(app);
 ## Stack File
 
 ```typescript
-import { Cdk, Lambda, type LambdaProps } from '@thunder-so/thunder';
+import { Cdk, Lambda, type LambdaProps } from "@thunder-so/thunder";
 
 const config: LambdaProps = {
   env: {
-    account: '123456789012',
-    region: 'us-east-1',
+    account: "123456789012",
+    region: "us-east-1",
   },
-  application: 'myapp',
-  service: 'api',
-  environment: 'dev',
+  application: "myapp",
+  service: "api",
+  environment: "dev",
 
-  rootDir: '.',
+  rootDir: ".",
 
   functionProps: {
     runtime: Cdk.aws_lambda.Runtime.NODEJS_22_X,
     architecture: Cdk.aws_lambda.Architecture.ARM_64,
-    codeDir: 'dist',       // directory containing your built handler
-    handler: 'index.handler',
+    codeDir: "dist", // directory containing your built handler
+    handler: "index.handler",
     memorySize: 512,
     timeout: 10,
   },
@@ -87,7 +87,7 @@ const config: LambdaProps = {
 new Lambda(
   new Cdk.App(),
   `${config.application}-${config.service}-${config.environment}-stack`,
-  config
+  config,
 );
 ```
 
@@ -116,9 +116,10 @@ myapp-api-dev-stack.ApiGatewayUrl = https://abc123.execute-api.us-east-1.amazona
 ```typescript
 const config: LambdaProps = {
   // ...
-  domain: 'api.example.com',
-  regionalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/abc-123',
-  hostedZoneId: 'Z1234567890ABC',
+  domain: "api.example.com",
+  regionalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+  hostedZoneId: "Z1234567890ABC",
 };
 ```
 
@@ -159,12 +160,12 @@ Thunder automatically grants the Lambda execution role `secretsmanager:GetSecret
 
 ## Stack Outputs
 
-| Output | Description |
-|---|---|
-| `ApiGatewayUrl` | API Gateway endpoint URL |
-| `LambdaFunction` | Lambda function name |
-| `LambdaFunctionUrl` | Direct Lambda URL (only if `url: true`) |
-| `Route53Domain` | Custom domain URL (only if domain is configured) |
+| Output              | Description                                      |
+| ------------------- | ------------------------------------------------ |
+| `ApiGatewayUrl`     | API Gateway endpoint URL                         |
+| `LambdaFunction`    | Lambda function name                             |
+| `LambdaFunctionUrl` | Direct Lambda URL (only if `url: true`)          |
+| `Route53Domain`     | Custom domain URL (only if domain is configured) |
 
 ## Destroy
 

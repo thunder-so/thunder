@@ -12,6 +12,7 @@ cd my-nextjs-app
 ```
 
 When prompted:
+
 - TypeScript: Yes
 - ESLint: Yes
 - Tailwind CSS: Yes (optional)
@@ -26,10 +27,10 @@ Reference: [Next.js Installation Docs](https://nextjs.org/docs/getting-started/i
 Edit `next.config.ts`:
 
 ```typescript
-import type { NextConfig } from 'next';
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'standalone',  // Optimized for Docker
+  output: "standalone", // Optimized for Docker
 };
 
 export default nextConfig;
@@ -98,34 +99,34 @@ bun add @thunder-so/thunder --development
 Create `stack/prod.ts`:
 
 ```typescript
-import { Cdk, Fargate, type FargateProps } from '@thunder-so/thunder';
+import { Cdk, Fargate, type FargateProps } from "@thunder-so/thunder";
 
 const config: FargateProps = {
   env: {
-    account: '123456789012',  // Your AWS account ID
-    region: 'us-east-1',
+    account: "123456789012", // Your AWS account ID
+    region: "us-east-1",
   },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
+  application: "myapp",
+  service: "web",
+  environment: "prod",
 
-  rootDir: '.',
+  rootDir: ".",
 
   serviceProps: {
-    dockerFile: 'Dockerfile',
+    dockerFile: "Dockerfile",
     architecture: Cdk.aws_ecs.CpuArchitecture.ARM64,
-    cpu: 512,        // 0.5 vCPU
+    cpu: 512, // 0.5 vCPU
     memorySize: 1024, // 1 GB
     port: 3000,
     desiredCount: 1,
-    healthCheckPath: '/',
+    healthCheckPath: "/",
   },
 };
 
 new Fargate(
   new Cdk.App(),
   `${config.application}-${config.service}-${config.environment}-stack`,
-  config
+  config,
 );
 ```
 
@@ -152,13 +153,15 @@ Update your stack:
 ```typescript
 const config: FargateProps = {
   // ...
-  domain: 'app.example.com',
-  regionalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/abc-123',
-  hostedZoneId: 'Z1234567890ABC',
+  domain: "app.example.com",
+  regionalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+  hostedZoneId: "Z1234567890ABC",
 };
 ```
 
 When a domain is configured:
+
 - HTTPS listener is added on port 443
 - HTTP on port 80 redirects to HTTPS
 - Route53 A record is created
@@ -210,13 +213,13 @@ See [Fargate CPU/memory combinations](https://docs.aws.amazon.com/AmazonECS/late
 
 Minimal deployment (1 task, `us-east-1`, no free tier):
 
-| Component | Monthly |
-|---|---|
-| Fargate (1 task, 0.5 vCPU / 1 GB) | ~$15 |
-| Application Load Balancer | ~$22 |
-| CloudWatch Logs | <$1 |
-| Route53 | $0.50 |
-| **Total** | **~$38/month** |
+| Component                         | Monthly        |
+| --------------------------------- | -------------- |
+| Fargate (1 task, 0.5 vCPU / 1 GB) | ~$15           |
+| Application Load Balancer         | ~$22           |
+| CloudWatch Logs                   | <$1            |
+| Route53                           | $0.50          |
+| **Total**                         | **~$38/month** |
 
 ## Related
 

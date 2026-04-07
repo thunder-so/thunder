@@ -22,11 +22,11 @@ bun add @astro-aws/adapter
 Edit `astro.config.mjs`:
 
 ```javascript
-import { defineConfig } from 'astro/config';
-import aws from '@astro-aws/adapter';
+import { defineConfig } from "astro/config";
+import aws from "@astro-aws/adapter";
 
 export default defineConfig({
-  output: 'server',  // Enable SSR
+  output: "server", // Enable SSR
   adapter: aws(),
 });
 ```
@@ -40,6 +40,7 @@ bun run build
 ```
 
 This generates:
+
 - `dist/lambda/` - Lambda handler
 - `dist/client/` - Static assets for S3
 
@@ -54,23 +55,23 @@ bun add @thunder-so/thunder --development
 Create `stack/prod.ts`:
 
 ```typescript
-import { Cdk, Astro, type AstroProps } from '@thunder-so/thunder';
+import { Cdk, Astro, type AstroProps } from "@thunder-so/thunder";
 
 const config: AstroProps = {
   env: {
-    account: '123456789012',
-    region: 'us-east-1',
+    account: "123456789012",
+    region: "us-east-1",
   },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
 };
 
 new Astro(
   new Cdk.App(),
   `${config.application}-${config.service}-${config.environment}-stack`,
-  config
+  config,
 );
 ```
 
@@ -85,10 +86,12 @@ npx cdk deploy --app "npx tsx stack/prod.ts" --profile default
 ```typescript
 const config: AstroProps = {
   // ...
-  domain: 'app.example.com',
-  hostedZoneId: 'Z1234567890ABC',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/abc-123',
-  regionalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/def-456',
+  domain: "app.example.com",
+  hostedZoneId: "Z1234567890ABC",
+  globalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+  regionalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/def-456",
 };
 ```
 

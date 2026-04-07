@@ -15,7 +15,11 @@ export class TemplateConstruct extends Construct {
   constructor(scope: Construct, id: string, props: TemplateProps) {
     super(scope, id);
 
-    const resourceIdPrefix = getResourceIdPrefix(props.application, props.service, props.environment);
+    const resourceIdPrefix = getResourceIdPrefix(
+      props.application,
+      props.service,
+      props.environment,
+    );
 
     const vpc = resolveVpc(props.vpc);
 
@@ -38,7 +42,9 @@ export class TemplateConstruct extends Construct {
 
     // 3. EC2 instance
     this.instance = new Ec2Instance(this, "Server", {
-      instanceType: props.instanceType || InstanceType.of(InstanceClass.T3, InstanceSize.MICRO),
+      instanceType:
+        props.instanceType ||
+        InstanceType.of(InstanceClass.T3, InstanceSize.MICRO),
       userData,
       stackName: resourceIdPrefix,
       vpc: vpc,
@@ -47,7 +53,11 @@ export class TemplateConstruct extends Construct {
 
     // 4. Route53 DNS (if domain + hostedZoneId provided)
     if (props.domain && props.hostedZoneId) {
-      const zone = HostedZone.fromHostedZoneId(this, "HostedZone", props.hostedZoneId);
+      const zone = HostedZone.fromHostedZoneId(
+        this,
+        "HostedZone",
+        props.hostedZoneId,
+      );
       new ARecord(this, "ARecord", {
         zone,
         recordName: props.domain,

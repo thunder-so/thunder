@@ -1,7 +1,7 @@
-import { Runtime, Architecture } from 'aws-cdk-lib/aws-lambda';
-import { AppProps } from './AppProps';
-import { PipelineWithRuntimeProps } from './PipelineProps';
-import { CloudFrontProps } from './CloudFrontProps';
+import { Runtime, Architecture } from "aws-cdk-lib/aws-lambda";
+import { AppProps } from "./AppProps";
+import { PipelineWithRuntimeProps } from "./PipelineProps";
+import { CloudFrontProps } from "./CloudFrontProps";
 
 export interface NuxtServerProps {
   /**
@@ -55,7 +55,7 @@ export interface NuxtServerProps {
   /**
    * Optional. Environment variables for the Lambda function.
    */
-  readonly variables?: Array<{ [key: string]: string; }>;
+  readonly variables?: Array<{ [key: string]: string }>;
   /**
    * Optional. Create a secret with AWS Secrets Manager and pass them to the Lambda function as environment variables.
    */
@@ -93,10 +93,7 @@ export interface NuxtDomainProps {
   readonly hostedZoneId?: string;
 }
 
-export interface NuxtProps extends 
-  AppProps, 
-  PipelineWithRuntimeProps, 
-  NuxtDomainProps,
-  CloudFrontProps {
-    readonly serverProps?: NuxtServerProps;
+export interface NuxtProps
+  extends AppProps, PipelineWithRuntimeProps, NuxtDomainProps, CloudFrontProps {
+  readonly serverProps?: NuxtServerProps;
 }

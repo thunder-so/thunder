@@ -1,7 +1,7 @@
 import { InstanceType } from "aws-cdk-lib/aws-ec2";
-import { AppProps } from './AppProps';
-import { HydrateResult } from '../lib/template/template/hydrate';
-import { VpcLinkProps } from './VpcProps';
+import { AppProps } from "./AppProps";
+import { HydrateResult } from "../lib/template/template/hydrate";
+import { VpcLinkProps } from "./VpcProps";
 
 /**
  * Domain and SSL properties
@@ -45,8 +45,5 @@ export interface TemplateBaseProps {
   readonly logRetentionDays?: number;
 }
 
-export interface TemplateProps extends 
-  AppProps, 
-  VpcLinkProps, 
-  TemplateDomainProps,
-  TemplateBaseProps {}
+export interface TemplateProps
+  extends AppProps, VpcLinkProps, TemplateDomainProps, TemplateBaseProps {}

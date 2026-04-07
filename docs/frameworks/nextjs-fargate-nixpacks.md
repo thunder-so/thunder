@@ -22,6 +22,7 @@ npm install -g nixpacks
 ```
 
 Verify:
+
 ```bash
 nixpacks --version
 ```
@@ -39,17 +40,17 @@ bun add @thunder-so/thunder --development
 Create `stack/prod.ts`:
 
 ```typescript
-import { Cdk, Fargate, type FargateProps } from '@thunder-so/thunder';
+import { Cdk, Fargate, type FargateProps } from "@thunder-so/thunder";
 
 const config: FargateProps = {
   env: {
-    account: '123456789012',
-    region: 'us-east-1',
+    account: "123456789012",
+    region: "us-east-1",
   },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
 
   serviceProps: {
     architecture: Cdk.aws_ecs.CpuArchitecture.ARM64,
@@ -57,20 +58,20 @@ const config: FargateProps = {
     memorySize: 1024,
     port: 3000,
     desiredCount: 1,
-    healthCheckPath: '/',
+    healthCheckPath: "/",
   },
 
   buildProps: {
-    buildSystem: 'Nixpacks',
-    runtime_version: '22',
-    startcmd: 'bun start',
+    buildSystem: "Nixpacks",
+    runtime_version: "22",
+    startcmd: "bun start",
   },
 };
 
 new Fargate(
   new Cdk.App(),
   `${config.application}-${config.service}-${config.environment}-stack`,
-  config
+  config,
 );
 ```
 
@@ -87,9 +88,10 @@ Nixpacks generates a Dockerfile during `cdk synth`, then CDK builds and deploys 
 ```typescript
 const config: FargateProps = {
   // ...
-  domain: 'app.example.com',
-  regionalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/abc-123',
-  hostedZoneId: 'Z1234567890ABC',
+  domain: "app.example.com",
+  regionalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+  hostedZoneId: "Z1234567890ABC",
 };
 ```
 

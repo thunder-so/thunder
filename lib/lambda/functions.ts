@@ -1,22 +1,45 @@
-import fs from 'fs';
-import fse from 'fs-extra';
-import path from 'path';
-import { Aws, Duration, CfnOutput } from 'aws-cdk-lib';
-import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { Construct } from 'constructs';
-import { Function, FunctionUrl, Runtime, Code, Alias, Architecture, Tracing, FunctionUrlAuthType, DockerImageCode, DockerImageFunction, LayerVersion } from 'aws-cdk-lib/aws-lambda';
-import { Repository } from 'aws-cdk-lib/aws-ecr';
-import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
-import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
-import { ARecord, AaaaRecord, RecordTarget, HostedZone } from 'aws-cdk-lib/aws-route53';
-import { IVpc } from 'aws-cdk-lib/aws-ec2';
-import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
-import { HttpApi, DomainName, EndpointType, SecurityPolicy, HttpMethod } from 'aws-cdk-lib/aws-apigatewayv2';
-import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
-import { Rule, Schedule, RuleTargetInput } from 'aws-cdk-lib/aws-events';
-import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
-import { LambdaProps } from '../../types/LambdaProps';
-import { getResourceIdPrefix, resolveVpc } from '../utils';
+import fs from "fs";
+import fse from "fs-extra";
+import path from "path";
+import { Aws, Duration, CfnOutput } from "aws-cdk-lib";
+import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { Construct } from "constructs";
+import {
+  Function,
+  FunctionUrl,
+  Runtime,
+  Code,
+  Alias,
+  Architecture,
+  Tracing,
+  FunctionUrlAuthType,
+  DockerImageCode,
+  DockerImageFunction,
+  LayerVersion,
+} from "aws-cdk-lib/aws-lambda";
+import { Repository } from "aws-cdk-lib/aws-ecr";
+import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
+import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
+import {
+  ARecord,
+  AaaaRecord,
+  RecordTarget,
+  HostedZone,
+} from "aws-cdk-lib/aws-route53";
+import { IVpc } from "aws-cdk-lib/aws-ec2";
+import { Secret } from "aws-cdk-lib/aws-secretsmanager";
+import {
+  HttpApi,
+  DomainName,
+  EndpointType,
+  SecurityPolicy,
+  HttpMethod,
+} from "aws-cdk-lib/aws-apigatewayv2";
+import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
+import { Rule, Schedule, RuleTargetInput } from "aws-cdk-lib/aws-events";
+import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
+import { LambdaProps } from "../../types/LambdaProps";
+import { getResourceIdPrefix, resolveVpc } from "../utils";
 
 export interface FunctionConstructProps extends LambdaProps {
   repository: Repository;
@@ -35,62 +58,90 @@ export class FunctionsConstruct extends Construct {
     super(scope, id);
 
     // Set the resource prefix
-    this.resourceIdPrefix = getResourceIdPrefix(props.application, props.service, props.environment);
+    this.resourceIdPrefix = getResourceIdPrefix(
+      props.application,
+      props.service,
+      props.environment,
+    );
 
     // Sanitize paths to ensure valid unix directory paths
     const sanitizePath = (path: string | undefined): string => {
-      if (!path) return '';
-      return path.replace(/[^a-zA-Z0-9._\-@#$%^&*+=~ /]|\/+/g, m => m.includes('/') ? '/' : '').replace(/^\/+|\/+$/g, '')
+      if (!path) return "";
+      return path
+        .replace(/[^a-zA-Z0-9._\-@#$%^&*+=~ /]|\/+/g, (m) =>
+          m.includes("/") ? "/" : "",
+        )
+        .replace(/^\/+|\/+$/g, "");
     };
 
-    this.rootDir = path.join(props.contextDirectory || '', sanitizePath(props?.rootDir));
-    this.codeDir = path.join(this.rootDir, sanitizePath(props?.functionProps?.codeDir));
+    this.rootDir = path.join(
+      props.contextDirectory || "",
+      sanitizePath(props?.rootDir),
+    );
+    this.codeDir = path.join(
+      this.rootDir,
+      sanitizePath(props?.functionProps?.codeDir),
+    );
 
     const vpc = resolveVpc(props.vpc);
 
     // Determine Lambda function type based on whether a Dockerfile path was provided
     const isContainerLambda = !!props.functionProps?.dockerFile;
-    
+
     this.lambdaFunction = isContainerLambda
       ? this.createContainerLambdaFunction(props, vpc)
       : this.createLambdaFunction(props, vpc);
 
     // Handle provisioned concurrency if specified
-    if (props.functionProps?.provisionedConcurrency && props.functionProps.provisionedConcurrency > 0) {
+    if (
+      props.functionProps?.provisionedConcurrency &&
+      props.functionProps.provisionedConcurrency > 0
+    ) {
       // Provisioned concurrency requires the creation of a version and an alias
       const version = this.lambdaFunction.currentVersion;
-      new Alias(this, 'LambdaAlias', {
-        aliasName: 'live',
+      new Alias(this, "LambdaAlias", {
+        aliasName: "live",
         version: version,
-        provisionedConcurrentExecutions: props.functionProps.provisionedConcurrency,
+        provisionedConcurrentExecutions:
+          props.functionProps.provisionedConcurrency,
       });
     }
 
     // Include the environment variables and secrets in the Lambda function
-    if (props.functionProps?.variables && props.functionProps?.variables?.length > 0) {
+    if (
+      props.functionProps?.variables &&
+      props.functionProps?.variables?.length > 0
+    ) {
       this.addEnvironmentVariables(props.functionProps?.variables || []);
     }
-    if (props.functionProps?.secrets && props.functionProps?.secrets?.length > 0) {
+    if (
+      props.functionProps?.secrets &&
+      props.functionProps?.secrets?.length > 0
+    ) {
       this.addSecrets(props.functionProps?.secrets || []);
     }
 
     // We want the API gateway to be accessible by the custom domain name.
     if (props.domain && props.regionalCertificateArn) {
-      this.domainName = new DomainName(this, 'DomainName', {
+      this.domainName = new DomainName(this, "DomainName", {
         domainName: props.domain,
-        certificate: Certificate.fromCertificateArn(this, 'RegionalCertificate', props.regionalCertificateArn),
+        certificate: Certificate.fromCertificateArn(
+          this,
+          "RegionalCertificate",
+          props.regionalCertificateArn,
+        ),
         endpointType: EndpointType.REGIONAL,
-        securityPolicy: SecurityPolicy.TLS_1_2
+        securityPolicy: SecurityPolicy.TLS_1_2,
       });
-    };
+    }
 
     // Create the API gateway to make the Lambda function publicly available
     this.apiGateway = this.createApiGateway(props);
-    
+
     // Output the API Gateway URL
-    new CfnOutput(this, 'ApiGatewayUrl', {
+    new CfnOutput(this, "ApiGatewayUrl", {
       value: this.apiGateway?.url as string,
-      description: 'URL of the API Gateway',
+      description: "URL of the API Gateway",
       exportName: `${this.resourceIdPrefix}-ApiGatewayUrl`,
     });
 
@@ -101,9 +152,9 @@ export class FunctionsConstruct extends Construct {
       });
 
       // Output the Lambda function URL
-      new CfnOutput(this, 'LambdaFunctionUrl', {
+      new CfnOutput(this, "LambdaFunctionUrl", {
         value: this.lambdaFunctionUrl.url,
-        description: 'URL of the Lambda function',
+        description: "URL of the Lambda function",
         exportName: `${this.resourceIdPrefix}-LambdaFunctionUrl`,
       });
     }
@@ -112,9 +163,9 @@ export class FunctionsConstruct extends Construct {
     if (props.domain && props.regionalCertificateArn && props.hostedZoneId) {
       this.createDnsRecords(props);
 
-      new CfnOutput(this, 'Route53Domain', {
+      new CfnOutput(this, "Route53Domain", {
         value: `https://${props.domain}`,
-        description: 'The custom domain URL',
+        description: "The custom domain URL",
         exportName: `${this.resourceIdPrefix}-Route53Domain`,
       });
     }
@@ -125,22 +176,21 @@ export class FunctionsConstruct extends Construct {
     }
 
     // Output the Lambda function Name
-    new CfnOutput(this, 'LambdaFunction', {
+    new CfnOutput(this, "LambdaFunction", {
       value: this.lambdaFunction.functionName,
-      description: 'Name of the Lambda function',
+      description: "Name of the Lambda function",
       exportName: `${this.resourceIdPrefix}-LambdaFunction`,
     });
   }
 
-
   /**
    * Include the specified files and directories in the Lambda function code.
    * * @param {string[]} include - The paths to include in the Lambda function code.
-   * 
+   *
    * @private
    */
-  private includeFilesAndDirectories(includes: string[]): void {    
-    includes.forEach(file => {
+  private includeFilesAndDirectories(includes: string[]): void {
+    includes.forEach((file) => {
       const srcFile = path.join(this.rootDir, file);
       if (fs.existsSync(srcFile)) {
         const destFile = path.join(this.codeDir, file);
@@ -152,30 +202,37 @@ export class FunctionsConstruct extends Construct {
   /**
    * Create the container lambda function to render the app.
    * * @param {FunctionConstructProps} props - The properties for the app.
-   * * @returns {Function} The Lambda function. 
-   * 
+   * * @returns {Function} The Lambda function.
+   *
    * @private
    */
-  private createContainerLambdaFunction(props: FunctionConstructProps, vpc?: IVpc): Function {
+  private createContainerLambdaFunction(
+    props: FunctionConstructProps,
+    vpc?: IVpc,
+  ): Function {
     // Custom Dockerfile
     const dockerFile = props.functionProps?.dockerFile;
     if (!dockerFile) {
-      throw new Error('dockerFile path is required for container Lambda functions');
+      throw new Error(
+        "dockerFile path is required for container Lambda functions",
+      );
     }
 
     const imageAsset = DockerImageCode.fromImageAsset(this.rootDir, {
       buildArgs: {
         NODE_ENV: props.environment,
-        ...(Object.fromEntries(
-          Object.entries(props.functionProps?.dockerBuildArgs || {}).map(([key, value]) => [key, String(value)])
-        )),
+        ...Object.fromEntries(
+          Object.entries(props.functionProps?.dockerBuildArgs || {}).map(
+            ([key, value]) => [key, String(value)],
+          ),
+        ),
       },
       file: dockerFile,
       exclude: props.functionProps?.exclude || [],
     });
-    
+
     // Create log group for container function
-    const containerLogGroup = new LogGroup(this, 'ContainerFunctionLogGroup', {
+    const containerLogGroup = new LogGroup(this, "ContainerFunctionLogGroup", {
       logGroupName: `/aws/lambda/${this.resourceIdPrefix}-container-function`,
       retention: RetentionDays.ONE_MONTH,
     });
@@ -186,8 +243,8 @@ export class FunctionsConstruct extends Construct {
       description: `Renders the ${this.resourceIdPrefix} app.`,
       architecture: props.functionProps?.architecture || Architecture.ARM_64,
       code: imageAsset,
-      timeout: props.functionProps?.timeout 
-        ? Duration.seconds(props.functionProps.timeout) 
+      timeout: props.functionProps?.timeout
+        ? Duration.seconds(props.functionProps.timeout)
         : Duration.seconds(10),
       memorySize: props.functionProps?.memorySize || 1792,
       logGroup: containerLogGroup,
@@ -195,10 +252,14 @@ export class FunctionsConstruct extends Construct {
       vpc: vpc,
       tracing: props.functionProps?.tracing ? Tracing.ACTIVE : Tracing.DISABLED,
       environment: {
-        NODE_OPTIONS: '--enable-source-maps',
-        NITRO_PRESET: 'aws-lambda',
+        NODE_OPTIONS: "--enable-source-maps",
+        NITRO_PRESET: "aws-lambda",
       },
-      reservedConcurrentExecutions: props.functionProps?.reservedConcurrency && props.functionProps.reservedConcurrency > 0 ? props.functionProps.reservedConcurrency : undefined,
+      reservedConcurrentExecutions:
+        props.functionProps?.reservedConcurrency &&
+        props.functionProps.reservedConcurrency > 0
+          ? props.functionProps.reservedConcurrency
+          : undefined,
     });
 
     // Add ECR permissions to the Lambda execution role
@@ -207,11 +268,9 @@ export class FunctionsConstruct extends Construct {
       lambdaFunction.addToRolePolicy(
         new PolicyStatement({
           effect: Effect.ALLOW,
-          actions: [
-            "ecr:GetAuthorizationToken",
-          ],
+          actions: ["ecr:GetAuthorizationToken"],
           resources: ["*"], // GetAuthorizationToken requires * resource
-        })
+        }),
       );
 
       lambdaFunction.addToRolePolicy(
@@ -219,60 +278,82 @@ export class FunctionsConstruct extends Construct {
           effect: Effect.ALLOW,
           actions: [
             "ecr:BatchCheckLayerAvailability",
-            "ecr:GetDownloadUrlForLayer", 
+            "ecr:GetDownloadUrlForLayer",
             "ecr:BatchGetImage",
             "ecr:DescribeImages",
             "ecr:DescribeRepositories",
           ],
           resources: ["*"], // Allow access to any ECR repository for flexibility
-        })
+        }),
       );
     }
 
-    return lambdaFunction; 
+    return lambdaFunction;
   }
 
   /**
    * Create the Lambda function
-   * 
+   *
    * @private
    */
-  private createLambdaFunction(props: FunctionConstructProps, vpc?: IVpc): Function {
+  private createLambdaFunction(
+    props: FunctionConstructProps,
+    vpc?: IVpc,
+  ): Function {
     // Include the specified files and directories to output directory
-    if (props.functionProps?.include && props.functionProps?.include.length > 0) {
+    if (
+      props.functionProps?.include &&
+      props.functionProps?.include.length > 0
+    ) {
       this.includeFilesAndDirectories(props.functionProps?.include);
     }
 
     // Create log group for function
-    const functionLogGroup = new LogGroup(this, 'FunctionLogGroup', {
+    const functionLogGroup = new LogGroup(this, "FunctionLogGroup", {
       logGroupName: `/aws/lambda/${this.resourceIdPrefix}-function`,
       retention: RetentionDays.ONE_MONTH,
     });
 
     // Create the Lambda function
-    const lambdaFunction = new Function(this, 'Function', {
+    const lambdaFunction = new Function(this, "Function", {
       functionName: `${this.resourceIdPrefix}-function`,
       description: `Lambda function for ${this.resourceIdPrefix}`,
       runtime: props.functionProps?.runtime || Runtime.NODEJS_20_X,
       architecture: props.functionProps?.architecture || Architecture.ARM_64,
-      handler: props.functionProps?.handler || 'index.handler',
+      handler: props.functionProps?.handler || "index.handler",
       code: Code.fromAsset(this.codeDir, {
-        exclude: props.functionProps?.exclude || ['**/*.svg', '**/*.ico', '**/*.png', '**/*.jpg', '**/*.js.map'],
+        exclude: props.functionProps?.exclude || [
+          "**/*.svg",
+          "**/*.ico",
+          "**/*.png",
+          "**/*.jpg",
+          "**/*.js.map",
+        ],
       }),
-      timeout: props.functionProps?.timeout 
-        ? Duration.seconds(props.functionProps.timeout) 
+      timeout: props.functionProps?.timeout
+        ? Duration.seconds(props.functionProps.timeout)
         : Duration.seconds(10),
       memorySize: props.functionProps?.memorySize || 1792,
       logGroup: functionLogGroup,
       vpc: vpc,
       tracing: props.functionProps?.tracing ? Tracing.ACTIVE : Tracing.DISABLED,
       environment: {
-        NODE_OPTIONS: '--enable-source-maps',
-        NITRO_PRESET: 'aws-lambda',
+        NODE_OPTIONS: "--enable-source-maps",
+        NITRO_PRESET: "aws-lambda",
       },
-      reservedConcurrentExecutions: props.functionProps?.reservedConcurrency && props.functionProps.reservedConcurrency > 0 ? props.functionProps.reservedConcurrency : undefined,
+      reservedConcurrentExecutions:
+        props.functionProps?.reservedConcurrency &&
+        props.functionProps.reservedConcurrency > 0
+          ? props.functionProps.reservedConcurrency
+          : undefined,
       layers: props.functionProps?.bunLayerArn
-        ? [LayerVersion.fromLayerVersionArn(this, 'BunLayer', props.functionProps.bunLayerArn)]
+        ? [
+            LayerVersion.fromLayerVersionArn(
+              this,
+              "BunLayer",
+              props.functionProps.bunLayerArn,
+            ),
+          ]
         : [],
     });
 
@@ -282,11 +363,13 @@ export class FunctionsConstruct extends Construct {
   /**
    * Add environment variables to the Lambda function.
    * @param {Array<Record<string, string>>} envVars - The environment variables to add.
-   * 
+   *
    * @private
    */
-  private addEnvironmentVariables(envVars: Array<{ [key: string]: string }>): void {
-    envVars.forEach(envVar => {
+  private addEnvironmentVariables(
+    envVars: Array<{ [key: string]: string }>,
+  ): void {
+    envVars.forEach((envVar) => {
       Object.entries(envVar).forEach(([key, value]) => {
         this.lambdaFunction.addEnvironment(key, value);
       });
@@ -300,15 +383,18 @@ export class FunctionsConstruct extends Construct {
    * @private
    */
   private addSecrets(secrets: Array<{ key: string; resource: string }>): void {
-    secrets.forEach(secret => {
+    secrets.forEach((secret) => {
       const importedSecret = Secret.fromSecretCompleteArn(
         this,
         `Secret-${secret.key}`,
-        secret.resource
+        secret.resource,
       );
 
       // Add the secret value as an environment variable
-      this.lambdaFunction.addEnvironment(secret.key, importedSecret.secretValue.unsafeUnwrap());
+      this.lambdaFunction.addEnvironment(
+        secret.key,
+        importedSecret.secretValue.unsafeUnwrap(),
+      );
 
       // Grant Lambda permission to read the secret
       importedSecret.grantRead(this.lambdaFunction);
@@ -321,7 +407,10 @@ export class FunctionsConstruct extends Construct {
    * @private
    */
   private createApiGateway(props: FunctionConstructProps): HttpApi {
-    const lambdaIntegration = new HttpLambdaIntegration('LambdaIntegration', this.lambdaFunction);
+    const lambdaIntegration = new HttpLambdaIntegration(
+      "LambdaIntegration",
+      this.lambdaFunction,
+    );
 
     const apiGateway = new HttpApi(this, "API", {
       apiName: `${this.resourceIdPrefix}-api`,
@@ -330,12 +419,14 @@ export class FunctionsConstruct extends Construct {
       corsPreflight: undefined,
       defaultIntegration: lambdaIntegration,
       createDefaultStage: true,
-      ...(this.domainName && { defaultDomainMapping: { domainName: this.domainName } })
+      ...(this.domainName && {
+        defaultDomainMapping: { domainName: this.domainName },
+      }),
     });
 
     apiGateway.addRoutes({
       integration: lambdaIntegration,
-      path: '/{proxy+}',
+      path: "/{proxy+}",
       methods: [HttpMethod.GET, HttpMethod.HEAD],
     });
 
@@ -344,16 +435,16 @@ export class FunctionsConstruct extends Construct {
 
   /**
    * Create the API Gateway and custom domain if provided
-   * 
+   *
    * @private
    */
   private createDnsRecords(props: FunctionConstructProps): void {
     // Import hosted zone
-    const domainParts = props.domain?.split('.') as string[];
+    const domainParts = props.domain?.split(".") as string[];
 
-    const hostedZone = HostedZone.fromHostedZoneAttributes(this, 'HostedZone', {
-        hostedZoneId: props.hostedZoneId as string,
-        zoneName: domainParts[domainParts.length - 1] // Support subdomains
+    const hostedZone = HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
+      hostedZoneId: props.hostedZoneId as string,
+      zoneName: domainParts[domainParts.length - 1], // Support subdomains
     });
 
     // Create an ARecord and AaaaRecord for the domain and API Gateway
@@ -364,16 +455,16 @@ export class FunctionsConstruct extends Construct {
       }),
     });
 
-    new ARecord(this, 'Ipv4Record', {
+    new ARecord(this, "Ipv4Record", {
       recordName: props.domain,
       zone: hostedZone,
-      target: dnsTarget
+      target: dnsTarget,
     });
 
-    new AaaaRecord(this, 'Ipv6Record', {
+    new AaaaRecord(this, "Ipv6Record", {
       recordName: props.domain,
       zone: hostedZone,
-      target: dnsTarget
+      target: dnsTarget,
     });
   }
 
@@ -385,28 +476,30 @@ export class FunctionsConstruct extends Construct {
    */
   private createPingRule(props: FunctionConstructProps): void {
     const fakeApiGatewayEventData = {
-        "version": "2.0",
-        "routeKey": "GET /{proxy+}",
-        "rawPath": "/",
-        "rawQueryString": "",
-        "headers": {},
-        "requestContext": {
-            "http": {
-                "method": "GET",
-                "path": "/",
-                "protocol": "HTTP/1.1"
-            }
-        }
+      version: "2.0",
+      routeKey: "GET /{proxy+}",
+      rawPath: "/",
+      rawQueryString: "",
+      headers: {},
+      requestContext: {
+        http: {
+          method: "GET",
+          path: "/",
+          protocol: "HTTP/1.1",
+        },
+      },
     };
 
     new Rule(this, `PingRule`, {
-        ruleName: `${this.resourceIdPrefix}-pinger`,
-        description: `Pings the Lambda function of the ${this.resourceIdPrefix} app every 5 minutes to keep it warm.`,
-        enabled: true,
-        schedule: Schedule.rate(Duration.minutes(5)),
-        targets: [new LambdaFunction(this.lambdaFunction, {
-            event: RuleTargetInput.fromObject(fakeApiGatewayEventData)
-        })],
+      ruleName: `${this.resourceIdPrefix}-pinger`,
+      description: `Pings the Lambda function of the ${this.resourceIdPrefix} app every 5 minutes to keep it warm.`,
+      enabled: true,
+      schedule: Schedule.rate(Duration.minutes(5)),
+      targets: [
+        new LambdaFunction(this.lambdaFunction, {
+          event: RuleTargetInput.fromObject(fakeApiGatewayEventData),
+        }),
+      ],
     });
   }
 }

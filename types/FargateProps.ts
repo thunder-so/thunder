@@ -1,7 +1,7 @@
-import { AppProps } from './AppProps'
-import { PipelineWithBuildSystemProps  } from './PipelineProps'
-import { CpuArchitecture } from 'aws-cdk-lib/aws-ecs'
-import { VpcLinkProps } from './VpcProps'
+import { AppProps } from "./AppProps";
+import { PipelineWithBuildSystemProps } from "./PipelineProps";
+import { CpuArchitecture } from "aws-cdk-lib/aws-ecs";
+import { VpcLinkProps } from "./VpcProps";
 
 /**
  * ECS Fargate container configuration properties
@@ -30,11 +30,11 @@ interface FargateServiceProps {
   /**
    * Environment variables for the container
    */
-  readonly variables?: Array<{ [key: string]: string; }>;
+  readonly variables?: Array<{ [key: string]: string }>;
   /**
    * Secrets from Secrets Manager to inject as environment variables
    */
-  readonly secrets?: { key: string; resource: string; }[];
+  readonly secrets?: { key: string; resource: string }[];
   /**
    * Path to Dockerfile relative to project root
    */
@@ -71,10 +71,11 @@ interface FargateDomainProps {
   readonly hostedZoneId?: string;
 }
 
-export interface FargateProps extends 
-  PipelineWithBuildSystemProps,
-  FargateDomainProps,
-  AppProps,
-  VpcLinkProps {
-    readonly serviceProps?: FargateServiceProps;
+export interface FargateProps
+  extends
+    PipelineWithBuildSystemProps,
+    FargateDomainProps,
+    AppProps,
+    VpcLinkProps {
+  readonly serviceProps?: FargateServiceProps;
 }

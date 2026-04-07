@@ -21,26 +21,26 @@ CloudFront (CDN)
 
 ## AWS Resources
 
-| Resource | Purpose |
-|---|---|
-| [Lambda Function](https://aws.amazon.com/lambda/) | Runs your server-side code (SSR, API routes) |
-| [API Gateway HTTP API](https://aws.amazon.com/api-gateway/) | Routes dynamic requests to Lambda |
-| [S3 Bucket](https://aws.amazon.com/s3/) | Hosts static assets (JS, CSS, images) |
-| [CloudFront Distribution](https://aws.amazon.com/cloudfront/) | Global CDN with origin routing |
-| [Origin Access Control (OAC)](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html) | Secures S3 - no public bucket access |
-| [ACM Certificate](https://aws.amazon.com/certificate-manager/) | SSL/TLS for custom domain (optional) |
-| [Route53](https://aws.amazon.com/route53/) | DNS A + AAAA records (optional) |
+| Resource                                                                                                                                        | Purpose                                      |
+| ----------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| [Lambda Function](https://aws.amazon.com/lambda/)                                                                                               | Runs your server-side code (SSR, API routes) |
+| [API Gateway HTTP API](https://aws.amazon.com/api-gateway/)                                                                                     | Routes dynamic requests to Lambda            |
+| [S3 Bucket](https://aws.amazon.com/s3/)                                                                                                         | Hosts static assets (JS, CSS, images)        |
+| [CloudFront Distribution](https://aws.amazon.com/cloudfront/)                                                                                   | Global CDN with origin routing               |
+| [Origin Access Control (OAC)](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html) | Secures S3 - no public bucket access         |
+| [ACM Certificate](https://aws.amazon.com/certificate-manager/)                                                                                  | SSL/TLS for custom domain (optional)         |
+| [Route53](https://aws.amazon.com/route53/)                                                                                                      | DNS A + AAAA records (optional)              |
 
 ## Supported Frameworks
 
-| Framework | Construct | Server Runtime | Notes |
-|---|---|---|---|
-| [Nuxt](https://nuxt.com/) | `Nuxt` | Nitro | Vue-based, `aws-lambda` preset |
-| [Astro](https://astro.build/) | `Astro` | @astro-aws/adapter | Requires Lambda@Edge fallback |
-| [TanStack Start](https://tanstack.com/start) | `TanStackStart` | Nitro | React-based, explicit `aws-lambda` preset required |
-| [SvelteKit](https://kit.svelte.dev/) | `SvelteKit` | @foladayo/sveltekit-adapter-lambda | Requires `serveStatic: true` |
-| [Solid Start](https://start.solidjs.com/) | `SolidStart` | Nitro | SolidJS-based, `aws-lambda` preset |
-| [AnalogJS](https://analogjs.org/) | `AnalogJS` | Nitro | Angular-based, `aws-lambda` preset |
+| Framework                                    | Construct       | Server Runtime                     | Notes                                              |
+| -------------------------------------------- | --------------- | ---------------------------------- | -------------------------------------------------- |
+| [Nuxt](https://nuxt.com/)                    | `Nuxt`          | Nitro                              | Vue-based, `aws-lambda` preset                     |
+| [Astro](https://astro.build/)                | `Astro`         | @astro-aws/adapter                 | Requires Lambda@Edge fallback                      |
+| [TanStack Start](https://tanstack.com/start) | `TanStackStart` | Nitro                              | React-based, explicit `aws-lambda` preset required |
+| [SvelteKit](https://kit.svelte.dev/)         | `SvelteKit`     | @foladayo/sveltekit-adapter-lambda | Requires `serveStatic: true`                       |
+| [Solid Start](https://start.solidjs.com/)    | `SolidStart`    | Nitro                              | SolidJS-based, `aws-lambda` preset                 |
+| [AnalogJS](https://analogjs.org/)            | `AnalogJS`      | Nitro                              | Angular-based, `aws-lambda` preset                 |
 
 See [framework-specific guides](#framework-guides) below for setup instructions.
 
@@ -64,17 +64,17 @@ npm install @thunder-so/thunder --save-dev
 ## Basic Example (Nuxt)
 
 ```typescript
-import { Cdk, Nuxt, type NuxtProps } from '@thunder-so/thunder';
+import { Cdk, Nuxt, type NuxtProps } from "@thunder-so/thunder";
 
 const config: NuxtProps = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
 };
 
-new Nuxt(new Cdk.App(), 'myapp-web-prod-stack', config);
+new Nuxt(new Cdk.App(), "myapp-web-prod-stack", config);
 ```
 
 ## Deploy
@@ -104,10 +104,12 @@ myapp-web-prod-stack.ApiGatewayUrl = https://abc123.execute-api.us-east-1.amazon
 ```typescript
 const config: ServerlessBaseProps = {
   // ...
-  domain: 'app.example.com',
-  hostedZoneId: 'Z1234567890ABC',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/abc-123',
-  regionalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/def-456',
+  domain: "app.example.com",
+  hostedZoneId: "Z1234567890ABC",
+  globalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+  regionalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/def-456",
 };
 ```
 
@@ -198,10 +200,10 @@ serverProps: {
 
 ## Stack Outputs
 
-| Output | Description |
-|---|---|
-| `CloudFrontUrl` | CloudFront distribution URL |
-| `ApiGatewayUrl` | API Gateway endpoint URL |
+| Output          | Description                                      |
+| --------------- | ------------------------------------------------ |
+| `CloudFrontUrl` | CloudFront distribution URL                      |
+| `ApiGatewayUrl` | API Gateway endpoint URL                         |
 | `Route53Domain` | Custom domain URL (only if domain is configured) |
 
 ## Framework Guides
@@ -220,34 +222,30 @@ Detailed setup instructions for each framework:
 For any Vite/Nitro-based meta-framework not explicitly supported, use the generic `Serverless` construct:
 
 ```typescript
-import { Cdk, Serverless, type ServerlessProps } from '@thunder-so/thunder';
+import { Cdk, Serverless, type ServerlessProps } from "@thunder-so/thunder";
 
 const config: ServerlessProps = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
-  
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
+
   serverProps: {
-    codeDir: '.output/server',  // Your framework's server output
-    handler: 'index.handler',
+    codeDir: ".output/server", // Your framework's server output
+    handler: "index.handler",
     runtime: Cdk.aws_lambda.Runtime.NODEJS_22_X,
     architecture: Cdk.aws_lambda.Architecture.ARM_64,
     memorySize: 1792,
     timeout: 10,
   },
-  
+
   clientProps: {
-    outputDir: '.output/public',  // Your framework's static assets
+    outputDir: ".output/public", // Your framework's static assets
   },
 };
 
-new Serverless(
-  new Cdk.App(),
-  'myapp-web-prod-stack',
-  config
-);
+new Serverless(new Cdk.App(), "myapp-web-prod-stack", config);
 ```
 
 This works with any framework that outputs a Lambda-compatible handler and static assets.

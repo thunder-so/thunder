@@ -2,4 +2,4 @@
 // Supports: Nuxt, Astro, TanStack Start, SvelteKit, Solid Start, AnalogJS
 
 // Framework-specific stacks (recommended)
-export * from './frameworks';
+export * from "./frameworks";

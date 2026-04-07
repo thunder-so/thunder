@@ -1,20 +1,38 @@
-import fs from 'fs';
-import fse from 'fs-extra';
-import path from 'path';
+import fs from "fs";
+import fse from "fs-extra";
+import path from "path";
 import { Aws, Duration } from "aws-cdk-lib";
-import { Construct } from 'constructs';
-import { RetentionDays, LogGroup } from 'aws-cdk-lib/aws-logs';
-import { Function, Runtime, Architecture, Code, Tracing, DockerImageCode, DockerImageFunction, Alias } from 'aws-cdk-lib/aws-lambda';
-import { HttpApi, HttpMethod, DomainName, EndpointType, SecurityPolicy } from 'aws-cdk-lib/aws-apigatewayv2';
-import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
-import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
-import { HttpOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
-import { OriginProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
-import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
-import { Rule, Schedule, RuleTargetInput } from 'aws-cdk-lib/aws-events';
-import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
-import { ServerlessProps, ServerlessServerProps } from '../../types/ServerlessProps';
-import { getResourceIdPrefix } from '../utils';
+import { Construct } from "constructs";
+import { RetentionDays, LogGroup } from "aws-cdk-lib/aws-logs";
+import {
+  Function,
+  Runtime,
+  Architecture,
+  Code,
+  Tracing,
+  DockerImageCode,
+  DockerImageFunction,
+  Alias,
+} from "aws-cdk-lib/aws-lambda";
+import {
+  HttpApi,
+  HttpMethod,
+  DomainName,
+  EndpointType,
+  SecurityPolicy,
+} from "aws-cdk-lib/aws-apigatewayv2";
+import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
+import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
+import { HttpOrigin } from "aws-cdk-lib/aws-cloudfront-origins";
+import { OriginProtocolPolicy } from "aws-cdk-lib/aws-cloudfront";
+import { Secret } from "aws-cdk-lib/aws-secretsmanager";
+import { Rule, Schedule, RuleTargetInput } from "aws-cdk-lib/aws-events";
+import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
+import {
+  ServerlessProps,
+  ServerlessServerProps,
+} from "../../types/ServerlessProps";
+import { getResourceIdPrefix } from "../utils";
 
 export interface ServerlessServerConstructProps extends ServerlessProps {
   framework: string;
@@ -28,14 +46,28 @@ export class ServerlessServer extends Construct {
   private apiGateway: HttpApi;
   public httpOrigin: HttpOrigin;
 
-  constructor(scope: Construct, id: string, props: ServerlessServerConstructProps) {
+  constructor(
+    scope: Construct,
+    id: string,
+    props: ServerlessServerConstructProps,
+  ) {
     super(scope, id);
 
     // Set the resource prefix
-    this.resourceIdPrefix = getResourceIdPrefix(props.application, props.service, props.environment);
+    this.resourceIdPrefix = getResourceIdPrefix(
+      props.application,
+      props.service,
+      props.environment,
+    );
 
-    this.rootDir = path.join(props.contextDirectory || '', props.rootDir || './');
-    this.codeDir = path.join(this.rootDir, props.serverProps?.codeDir || '.output/server');
+    this.rootDir = path.join(
+      props.contextDirectory || "",
+      props.rootDir || "./",
+    );
+    this.codeDir = path.join(
+      this.rootDir,
+      props.serverProps?.codeDir || ".output/server",
+    );
 
     // Include the specified files and directories to output directory
     if (props.serverProps?.include && props.serverProps?.include.length > 0) {
@@ -51,15 +83,19 @@ export class ServerlessServer extends Construct {
     if (props.serverProps?.provisionedConcurrency !== undefined) {
       // Provisioned concurrency requires the creation of a version and an alias
       const version = this.lambdaFunction.currentVersion;
-      new Alias(this, 'LambdaAlias', {
-        aliasName: 'live',
+      new Alias(this, "LambdaAlias", {
+        aliasName: "live",
         version: version,
-        provisionedConcurrentExecutions: props.serverProps.provisionedConcurrency,
+        provisionedConcurrentExecutions:
+          props.serverProps.provisionedConcurrency,
       });
     }
 
     // Include the environment variables in the Lambda function
-    if (props.serverProps?.variables && props.serverProps?.variables?.length > 0) {
+    if (
+      props.serverProps?.variables &&
+      props.serverProps?.variables?.length > 0
+    ) {
       this.addEnvironmentVariables(props.serverProps?.variables || []);
     }
     if (props.serverProps?.secrets && props.serverProps?.secrets?.length > 0) {
@@ -85,7 +121,7 @@ export class ServerlessServer extends Construct {
    * @private
    */
   private includeFilesAndDirectories(includes: string[]): void {
-    includes.forEach(file => {
+    includes.forEach((file) => {
       const srcFile = path.join(this.rootDir, file);
       if (fs.existsSync(srcFile)) {
         const destFile = path.join(this.codeDir, file);
@@ -101,7 +137,9 @@ export class ServerlessServer extends Construct {
    *
    * @private
    */
-  private createContainerLambdaFunction(props: ServerlessServerConstructProps): Function {
+  private createContainerLambdaFunction(
+    props: ServerlessServerConstructProps,
+  ): Function {
     // Include the Dockerfile to the server directory
     this.includeFilesAndDirectories([props.serverProps?.dockerFile as string]);
 
@@ -113,9 +151,11 @@ export class ServerlessServer extends Construct {
       code: DockerImageCode.fromImageAsset(this.codeDir, {
         buildArgs: {
           NODE_ENV: props.environment,
-          ...(Object.fromEntries(
-            Object.entries(props.serverProps?.dockerBuildArgs || {}).map(([key, value]) => [key, String(value)])
-          )),
+          ...Object.fromEntries(
+            Object.entries(props.serverProps?.dockerBuildArgs || {}).map(
+              ([key, value]) => [key, String(value)],
+            ),
+          ),
         },
         file: props.serverProps?.dockerFile,
         // Exclude files not needed in the Docker build context
@@ -125,15 +165,15 @@ export class ServerlessServer extends Construct {
         ? Duration.seconds(props.serverProps.timeout)
         : Duration.seconds(10),
       memorySize: props.serverProps?.memorySize || 1792,
-      logGroup: new LogGroup(this, 'ServerFunctionLogGroup', {
+      logGroup: new LogGroup(this, "ServerFunctionLogGroup", {
         logGroupName: `${this.resourceIdPrefix}-function-logs`,
         retention: RetentionDays.ONE_MONTH,
       }),
       allowPublicSubnet: false,
       tracing: props.serverProps?.tracing ? Tracing.ACTIVE : Tracing.DISABLED,
       environment: {
-        NODE_OPTIONS: '--enable-source-maps',
-        NITRO_PRESET: 'aws-lambda',
+        NODE_OPTIONS: "--enable-source-maps",
+        NITRO_PRESET: "aws-lambda",
       },
       reservedConcurrentExecutions: props.serverProps?.reservedConcurrency,
     });
@@ -146,31 +186,33 @@ export class ServerlessServer extends Construct {
    *
    * @private
    */
-  private createLambdaFunction(props: ServerlessServerConstructProps): Function {
+  private createLambdaFunction(
+    props: ServerlessServerConstructProps,
+  ): Function {
     const lambdaFunction = new Function(this, "Function", {
-        functionName: `${this.resourceIdPrefix}-function`,
-        description: `Renders the ${this.resourceIdPrefix} app.`,
-        runtime: props.serverProps?.runtime || Runtime.NODEJS_20_X,
-        architecture: props.serverProps?.architecture || Architecture.ARM_64,
-        handler: props.serverProps?.handler || 'index.handler',
-        code: Code.fromAsset(this.codeDir, {
-          exclude: props.serverProps?.exclude || [],
-        }),
-        timeout: props.serverProps?.timeout
-          ? Duration.seconds(props.serverProps.timeout)
-          : Duration.seconds(10),
-        memorySize: props.serverProps?.memorySize || 1792,
-        logGroup: new LogGroup(this, 'LambdaFunctionLogGroup', {
-          logGroupName: `${this.resourceIdPrefix}-function-logs`,
-          retention: RetentionDays.ONE_MONTH,
-        }),
-        allowPublicSubnet: false,
-        tracing: props.serverProps?.tracing ? Tracing.ACTIVE : Tracing.DISABLED,
-        environment: {
-            NODE_OPTIONS: '--enable-source-maps',
-            NITRO_PRESET: 'aws-lambda'
-        },
-        reservedConcurrentExecutions: props.serverProps?.reservedConcurrency,
+      functionName: `${this.resourceIdPrefix}-function`,
+      description: `Renders the ${this.resourceIdPrefix} app.`,
+      runtime: props.serverProps?.runtime || Runtime.NODEJS_20_X,
+      architecture: props.serverProps?.architecture || Architecture.ARM_64,
+      handler: props.serverProps?.handler || "index.handler",
+      code: Code.fromAsset(this.codeDir, {
+        exclude: props.serverProps?.exclude || [],
+      }),
+      timeout: props.serverProps?.timeout
+        ? Duration.seconds(props.serverProps.timeout)
+        : Duration.seconds(10),
+      memorySize: props.serverProps?.memorySize || 1792,
+      logGroup: new LogGroup(this, "LambdaFunctionLogGroup", {
+        logGroupName: `${this.resourceIdPrefix}-function-logs`,
+        retention: RetentionDays.ONE_MONTH,
+      }),
+      allowPublicSubnet: false,
+      tracing: props.serverProps?.tracing ? Tracing.ACTIVE : Tracing.DISABLED,
+      environment: {
+        NODE_OPTIONS: "--enable-source-maps",
+        NITRO_PRESET: "aws-lambda",
+      },
+      reservedConcurrentExecutions: props.serverProps?.reservedConcurrency,
     });
 
     return lambdaFunction;
@@ -182,8 +224,10 @@ export class ServerlessServer extends Construct {
    *
    * @private
    */
-  private addEnvironmentVariables(envVars: Array<{ [key: string]: string }>): void {
-    envVars.forEach(envVar => {
+  private addEnvironmentVariables(
+    envVars: Array<{ [key: string]: string }>,
+  ): void {
+    envVars.forEach((envVar) => {
       Object.entries(envVar).forEach(([key, value]) => {
         this.lambdaFunction.addEnvironment(key, value);
       });
@@ -197,15 +241,18 @@ export class ServerlessServer extends Construct {
    * @private
    */
   private addSecrets(secrets: Array<{ key: string; resource: string }>): void {
-    secrets.forEach(secret => {
+    secrets.forEach((secret) => {
       const importedSecret = Secret.fromSecretCompleteArn(
         this,
         `Secret-${secret.key}`,
-        secret.resource
+        secret.resource,
       );
 
       // Add the secret value as an environment variable
-      this.lambdaFunction.addEnvironment(secret.key, importedSecret.secretValue.unsafeUnwrap());
+      this.lambdaFunction.addEnvironment(
+        secret.key,
+        importedSecret.secretValue.unsafeUnwrap(),
+      );
 
       // Grant Lambda permission to read the secret
       importedSecret.grantRead(this.lambdaFunction);
@@ -218,19 +265,26 @@ export class ServerlessServer extends Construct {
    * @private
    */
   private createApiGateway(props: ServerlessServerConstructProps): HttpApi {
-    const lambdaIntegration = new HttpLambdaIntegration('LambdaIntegration', this.lambdaFunction);
+    const lambdaIntegration = new HttpLambdaIntegration(
+      "LambdaIntegration",
+      this.lambdaFunction,
+    );
 
     // We want the API gateway to be accessible by the custom domain name.
     let domainName: DomainName | undefined = undefined;
 
     if (props.domain && props.regionalCertificateArn) {
-      domainName = new DomainName(this, 'ApiDomain', {
+      domainName = new DomainName(this, "ApiDomain", {
         domainName: props.domain,
-        certificate: Certificate.fromCertificateArn(this, 'RegionalCertificate', props.regionalCertificateArn),
+        certificate: Certificate.fromCertificateArn(
+          this,
+          "RegionalCertificate",
+          props.regionalCertificateArn,
+        ),
         endpointType: EndpointType.REGIONAL,
-        securityPolicy: SecurityPolicy.TLS_1_2
+        securityPolicy: SecurityPolicy.TLS_1_2,
       });
-    };
+    }
 
     const apiGateway = new HttpApi(this, "API", {
       apiName: `${this.resourceIdPrefix}-api`,
@@ -238,12 +292,12 @@ export class ServerlessServer extends Construct {
       // The app does not allow any cross-origin access by purpose: the app should not be embeddable anywhere
       corsPreflight: undefined,
       defaultIntegration: lambdaIntegration,
-      ...(domainName && { defaultDomainMapping: { domainName } })
+      ...(domainName && { defaultDomainMapping: { domainName } }),
     });
 
     apiGateway.addRoutes({
       integration: lambdaIntegration,
-      path: '/{proxy+}',
+      path: "/{proxy+}",
       methods: [HttpMethod.GET, HttpMethod.HEAD],
     });
 
@@ -254,13 +308,16 @@ export class ServerlessServer extends Construct {
    * Creates the CloudFront distribution behavior origin to route incoming requests to the render Lambda function (via API gateway).
    */
   private createHttpOrigin(props: ServerlessServerConstructProps): HttpOrigin {
-    return new HttpOrigin(`${this.apiGateway.httpApiId}.execute-api.${Aws.REGION}.amazonaws.com`, {
-      originId: `${this.resourceIdPrefix}-httporigin`,
-      connectionAttempts: 2,
-      connectionTimeout: Duration.seconds(2),
-      readTimeout: Duration.seconds(10),
-      protocolPolicy: OriginProtocolPolicy.HTTPS_ONLY,
-    });
+    return new HttpOrigin(
+      `${this.apiGateway.httpApiId}.execute-api.${Aws.REGION}.amazonaws.com`,
+      {
+        originId: `${this.resourceIdPrefix}-httporigin`,
+        connectionAttempts: 2,
+        connectionTimeout: Duration.seconds(2),
+        readTimeout: Duration.seconds(10),
+        protocolPolicy: OriginProtocolPolicy.HTTPS_ONLY,
+      },
+    );
   }
 
   /**
@@ -271,28 +328,30 @@ export class ServerlessServer extends Construct {
    */
   private createPingRule(props: ServerlessServerConstructProps): void {
     const fakeApiGatewayEventData = {
-        "version": "2.0",
-        "routeKey": "GET /{proxy+}",
-        "rawPath": "/",
-        "rawQueryString": "",
-        "headers": {},
-        "requestContext": {
-            "http": {
-                "method": "GET",
-                "path": "/",
-                "protocol": "HTTP/1.1"
-            }
-        }
+      version: "2.0",
+      routeKey: "GET /{proxy+}",
+      rawPath: "/",
+      rawQueryString: "",
+      headers: {},
+      requestContext: {
+        http: {
+          method: "GET",
+          path: "/",
+          protocol: "HTTP/1.1",
+        },
+      },
     };
 
-    new Rule(this, 'PingRule', {
-        ruleName: `${this.resourceIdPrefix}-pinger`,
-        description: `Pings the Lambda function of the ${this.resourceIdPrefix} app every 5 minutes to keep it warm.`,
-        enabled: true,
-        schedule: Schedule.rate(Duration.minutes(5)),
-        targets: [new LambdaFunction(this.lambdaFunction, {
-            event: RuleTargetInput.fromObject(fakeApiGatewayEventData)
-        })],
+    new Rule(this, "PingRule", {
+      ruleName: `${this.resourceIdPrefix}-pinger`,
+      description: `Pings the Lambda function of the ${this.resourceIdPrefix} app every 5 minutes to keep it warm.`,
+      enabled: true,
+      schedule: Schedule.rate(Duration.minutes(5)),
+      targets: [
+        new LambdaFunction(this.lambdaFunction, {
+          event: RuleTargetInput.fromObject(fakeApiGatewayEventData),
+        }),
+      ],
     });
   }
 }

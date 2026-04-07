@@ -1,5 +1,5 @@
-import { IVpc } from 'aws-cdk-lib/aws-ec2';
-import { IVpcLink } from '../lib/utils/vpc';
+import { IVpc } from "aws-cdk-lib/aws-ec2";
+import { IVpcLink } from "../lib/utils/vpc";
 
 export interface VPCProps {
   cidr?: string;

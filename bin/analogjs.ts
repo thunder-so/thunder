@@ -1,6 +1,11 @@
 import { App } from "aws-cdk-lib";
-import { AnalogJS, type AnalogJSProps } from '../';
-import { getMetadata, resolveEnv, mapLambdaRuntime, mapLambdaArch } from './utils';
+import { AnalogJS, type AnalogJSProps } from "../";
+import {
+  getMetadata,
+  resolveEnv,
+  mapLambdaRuntime,
+  mapLambdaArch,
+} from "./utils";
 
 const app = new App();
 const raw = getMetadata(app);
@@ -10,10 +15,18 @@ const metadata: AnalogJSProps = {
   env: resolveEnv(raw),
   serverProps: {
     ...raw.serverProps,
-    ...( mapLambdaRuntime(raw.serverProps?.runtime) && { runtime: mapLambdaRuntime(raw.serverProps?.runtime) }),
-    ...( mapLambdaArch(raw.serverProps?.architecture) && { architecture: mapLambdaArch(raw.serverProps?.architecture) }),
+    ...(mapLambdaRuntime(raw.serverProps?.runtime) && {
+      runtime: mapLambdaRuntime(raw.serverProps?.runtime),
+    }),
+    ...(mapLambdaArch(raw.serverProps?.architecture) && {
+      architecture: mapLambdaArch(raw.serverProps?.architecture),
+    }),
   },
 };
 
-new AnalogJS(app, `${metadata.application}-${metadata.service}-${metadata.environment}-stack`, metadata);
+new AnalogJS(
+  app,
+  `${metadata.application}-${metadata.service}-${metadata.environment}-stack`,
+  metadata,
+);
 app.synth();

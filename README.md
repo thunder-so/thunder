@@ -59,25 +59,25 @@ npx th init
 Create a stack file (e.g., `stack/dev.ts`):
 
 ```typescript
-import { Cdk, Static, type StaticProps } from '@thunder-so/thunder';
+import { Cdk, Static, type StaticProps } from "@thunder-so/thunder";
 
 const myApp: StaticProps = {
-  env: { 
-    account: '123456789012', 
-    region: 'us-east-1' 
+  env: {
+    account: "123456789012",
+    region: "us-east-1",
   },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
+  application: "myapp",
+  service: "web",
+  environment: "prod",
 
-  rootDir: '.',
-  outputDir: 'dist',
+  rootDir: ".",
+  outputDir: "dist",
 };
 
 new Static(
   new Cdk.App(),
   `${myApp.application}-${myApp.service}-${myApp.environment}-stack`,
-  myApp
+  myApp,
 );
 ```
 
@@ -96,6 +96,7 @@ Deploy static websites to [S3](https://aws.amazon.com/s3/) with [CloudFront](htt
 **Best for:** Static sites, SPAs, JAMstack applications
 
 **AWS Resources:**
+
 - [S3 Bucket](https://aws.amazon.com/s3/) - Static file hosting
 - [CloudFront Distribution](https://aws.amazon.com/cloudfront/) - Global CDN with caching
 - [Route53](https://aws.amazon.com/route53/) - DNS management (optional)
@@ -103,29 +104,30 @@ Deploy static websites to [S3](https://aws.amazon.com/s3/) with [CloudFront](htt
 - [Lambda@Edge](https://aws.amazon.com/lambda/edge/) - Request/response manipulation (optional)
 
 **Example:**
+
 ```typescript
-import { Cdk, Static, type StaticProps } from '@thunder-so/thunder';
+import { Cdk, Static, type StaticProps } from "@thunder-so/thunder";
 
 const config: StaticProps = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
-  outputDir: 'dist',
-  
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
+  outputDir: "dist",
+
   // Optional: Custom domain
-  domain: 'example.com',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:...',
-  hostedZoneId: 'Z123456789',
-  
+  domain: "example.com",
+  globalCertificateArn: "arn:aws:acm:us-east-1:...",
+  hostedZoneId: "Z123456789",
+
   // Optional: Lambda@Edge for redirects/headers/rewrites
-  redirects: [{ source: '/old', destination: '/' }],
-  rewrites: [{ source: '/old', destination: '/new' }],
-  headers: [{ path: '/*', name: 'X-Custom-Header', value: 'value' }],
+  redirects: [{ source: "/old", destination: "/" }],
+  rewrites: [{ source: "/old", destination: "/new" }],
+  headers: [{ path: "/*", name: "X-Custom-Header", value: "value" }],
 };
 
-new Static(new Cdk.App(), 'myapp-web-prod-stack', config);
+new Static(new Cdk.App(), "myapp-web-prod-stack", config);
 ```
 
 ---
@@ -137,42 +139,44 @@ Deploy serverless functions with [API Gateway](https://aws.amazon.com/api-gatewa
 **Best for:** Serverless APIs, microservices, event-driven applications
 
 **AWS Resources:**
+
 - [Lambda Function](https://aws.amazon.com/lambda/) - Compute layer
 - [API Gateway](https://aws.amazon.com/api-gateway/) - HTTP API with custom domain support
 - [CloudWatch Logs](https://aws.amazon.com/cloudwatch/) - Logging and monitoring
 - [Secrets Manager](https://aws.amazon.com/secrets-manager/) - Secure secret injection (optional)
 
 **Example:**
+
 ```typescript
-import { Cdk, Lambda, type LambdaProps } from '@thunder-so/thunder';
+import { Cdk, Lambda, type LambdaProps } from "@thunder-so/thunder";
 
 const config: LambdaProps = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'api',
-  environment: 'prod',
-  rootDir: '.',
-  
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "api",
+  environment: "prod",
+  rootDir: ".",
+
   functionProps: {
     runtime: Cdk.aws_lambda.Runtime.NODEJS_22_X,
     architecture: Cdk.aws_lambda.Architecture.ARM_64,
-    codeDir: 'src',
-    handler: 'index.handler',
+    codeDir: "src",
+    handler: "index.handler",
     memorySize: 512,
     timeout: 30,
     url: true, // Enable function URL
     keepWarm: true, // Prevent cold starts
-    variables: [{ NODE_ENV: 'production' }],
-    secrets: [{ key: 'DATABASE_URL', resource: 'arn:aws:secretsmanager:...' }],
+    variables: [{ NODE_ENV: "production" }],
+    secrets: [{ key: "DATABASE_URL", resource: "arn:aws:secretsmanager:..." }],
   },
-  
+
   // Optional: Custom domain
-  domain: 'api.example.com',
-  regionalCertificateArn: 'arn:aws:acm:us-east-1:...',
-  hostedZoneId: 'Z123456789',
+  domain: "api.example.com",
+  regionalCertificateArn: "arn:aws:acm:us-east-1:...",
+  hostedZoneId: "Z123456789",
 };
 
-new Lambda(new Cdk.App(), 'myapp-api-prod-stack', config);
+new Lambda(new Cdk.App(), "myapp-api-prod-stack", config);
 ```
 
 ---
@@ -184,6 +188,7 @@ Deploy containerized applications on [ECS Fargate](https://aws.amazon.com/fargat
 **Best for:** Containerized web applications, microservices, long-running processes
 
 **AWS Resources:**
+
 - [ECS Cluster](https://aws.amazon.com/ecs/) - Container orchestration
 - [Fargate Task](https://aws.amazon.com/fargate/) - Serverless containers
 - [Application Load Balancer](https://aws.amazon.com/elasticloadbalancing/) - Traffic distribution
@@ -191,34 +196,35 @@ Deploy containerized applications on [ECS Fargate](https://aws.amazon.com/fargat
 - [CloudWatch Logs](https://aws.amazon.com/cloudwatch/) - Container logging
 
 **Example:**
+
 ```typescript
-import { Cdk, Fargate, type FargateProps } from '@thunder-so/thunder';
+import { Cdk, Fargate, type FargateProps } from "@thunder-so/thunder";
 
 const config: FargateProps = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'api',
-  environment: 'prod',
-  rootDir: '.',
-  
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "api",
+  environment: "prod",
+  rootDir: ".",
+
   serviceProps: {
     architecture: Cdk.aws_ecs.CpuArchitecture.ARM64,
     desiredCount: 2,
     cpu: 512, // 0.5 vCPU
     memorySize: 1024, // 1 GB
     port: 3000,
-    healthCheckPath: '/health',
-    variables: [{ NODE_ENV: 'production' }],
-    dockerFile: 'Dockerfile',
+    healthCheckPath: "/health",
+    variables: [{ NODE_ENV: "production" }],
+    dockerFile: "Dockerfile",
   },
-  
+
   // Optional: Custom domain
-  domain: 'api.example.com',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:...',
-  hostedZoneId: 'Z123456789',
+  domain: "api.example.com",
+  globalCertificateArn: "arn:aws:acm:us-east-1:...",
+  hostedZoneId: "Z123456789",
 };
 
-new Fargate(new Cdk.App(), 'myapp-api-prod-stack', config);
+new Fargate(new Cdk.App(), "myapp-api-prod-stack", config);
 ```
 
 ---
@@ -230,6 +236,7 @@ Deploy Docker containers on [EC2](https://aws.amazon.com/ec2/) instances with El
 **Best for:** Single-instance applications, development environments, simple Docker deployments
 
 **AWS Resources:**
+
 - [EC2 Instance](https://aws.amazon.com/ec2/) - Virtual server
 - [Elastic IP](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html) - Static public IP
 - [VPC](https://aws.amazon.com/vpc/) - Network isolation
@@ -237,31 +244,32 @@ Deploy Docker containers on [EC2](https://aws.amazon.com/ec2/) instances with El
 - [Route53](https://aws.amazon.com/route53/) - DNS records (optional)
 
 **Example:**
+
 ```typescript
-import { Cdk, Ec2, type Ec2Props } from '@thunder-so/thunder';
+import { Cdk, Ec2, type Ec2Props } from "@thunder-so/thunder";
 
 const config: Ec2Props = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'api',
-  environment: 'prod',
-  rootDir: '.',
-  
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "api",
+  environment: "prod",
+  rootDir: ".",
+
   serviceProps: {
-    instanceType: 't3.micro',
+    instanceType: "t3.micro",
     port: 3000,
-    authorizedKeys: ['ssh-rsa AAAAB3... user@example.com'],
-    dockerFile: 'Dockerfile',
-    variables: [{ NODE_ENV: 'production' }],
+    authorizedKeys: ["ssh-rsa AAAAB3... user@example.com"],
+    dockerFile: "Dockerfile",
+    variables: [{ NODE_ENV: "production" }],
   },
-  
+
   // Optional: Custom domain with SSL
-  domain: 'api.example.com',
-  hostedZoneId: 'Z123456789',
-  acmeEmail: 'admin@example.com', // For Let's Encrypt
+  domain: "api.example.com",
+  hostedZoneId: "Z123456789",
+  acmeEmail: "admin@example.com", // For Let's Encrypt
 };
 
-new Ec2(new Cdk.App(), 'myapp-api-prod-stack', config);
+new Ec2(new Cdk.App(), "myapp-api-prod-stack", config);
 ```
 
 ---
@@ -275,6 +283,7 @@ Deploy modern meta-frameworks as serverless applications with unified infrastruc
 **Supported Frameworks:** Nuxt, Astro, TanStack Start, SvelteKit, Solid Start, AnalogJS, or any Vite/Nitro-based framework using the generic `Serverless` construct.
 
 **AWS Resources:**
+
 - [Lambda Function](https://aws.amazon.com/lambda/) - SSR server with container support
 - [S3 Bucket](https://aws.amazon.com/s3/) - Static assets with OAC
 - [CloudFront Distribution](https://aws.amazon.com/cloudfront/) - Global CDN with custom domain
@@ -283,6 +292,7 @@ Deploy modern meta-frameworks as serverless applications with unified infrastruc
 - [ACM](https://aws.amazon.com/certificate-manager/) - SSL certificates (optional)
 
 **Supported Frameworks:**
+
 - [TanStack Start](https://tanstack.com/start) - Type-safe full-stack React framework
 - [Nuxt](https://nuxt.com/) - Vue-based full-stack framework
 - [Astro](https://astro.build/) - Content-focused web framework with islands architecture
@@ -293,47 +303,53 @@ Deploy modern meta-frameworks as serverless applications with unified infrastruc
 #### TanStack Start
 
 **Example:**
+
 ```typescript
-import { Cdk, TanStackStart, type TanStackStartProps } from '@thunder-so/thunder';
+import {
+  Cdk,
+  TanStackStart,
+  type TanStackStartProps,
+} from "@thunder-so/thunder";
 
 const config: TanStackStartProps = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
-  
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
+
   serverProps: {
     runtime: Cdk.aws_lambda.Runtime.NODEJS_22_X,
     architecture: Cdk.aws_lambda.Architecture.ARM_64,
     memorySize: 1792,
     timeout: 10,
     keepWarm: true,
-    variables: [{ NODE_ENV: 'production' }],
+    variables: [{ NODE_ENV: "production" }],
   },
-  
+
   // Optional: Custom domain
-  domain: 'myapp.com',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:...',
-  hostedZoneId: 'Z123456789',
+  domain: "myapp.com",
+  globalCertificateArn: "arn:aws:acm:us-east-1:...",
+  hostedZoneId: "Z123456789",
 };
 
-new TanStackStart(new Cdk.App(), 'myapp-web-prod-stack', config);
+new TanStackStart(new Cdk.App(), "myapp-web-prod-stack", config);
 ```
 
 #### Nuxt
 
 **Example:**
+
 ```typescript
-import { Cdk, Nuxt, type NuxtProps } from '@thunder-so/thunder';
+import { Cdk, Nuxt, type NuxtProps } from "@thunder-so/thunder";
 
 const config: NuxtProps = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
-  
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
+
   serverProps: {
     runtime: Cdk.aws_lambda.Runtime.NODEJS_22_X,
     architecture: Cdk.aws_lambda.Architecture.ARM_64,
@@ -341,141 +357,145 @@ const config: NuxtProps = {
     timeout: 10,
     keepWarm: true,
     streaming: true,
-    variables: [{ NODE_ENV: 'production' }],
-    secrets: [{ key: 'DATABASE_URL', resource: 'arn:aws:secretsmanager:...' }],
+    variables: [{ NODE_ENV: "production" }],
+    secrets: [{ key: "DATABASE_URL", resource: "arn:aws:secretsmanager:..." }],
   },
-  
+
   // Optional: Custom domain
-  domain: 'myapp.com',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:...',
-  hostedZoneId: 'Z123456789',
+  domain: "myapp.com",
+  globalCertificateArn: "arn:aws:acm:us-east-1:...",
+  hostedZoneId: "Z123456789",
 };
 
-new Nuxt(new Cdk.App(), 'myapp-web-prod-stack', config);
+new Nuxt(new Cdk.App(), "myapp-web-prod-stack", config);
 ```
 
 #### Astro
 
 **Example:**
+
 ```typescript
-import { Cdk, Astro, type AstroProps } from '@thunder-so/thunder';
+import { Cdk, Astro, type AstroProps } from "@thunder-so/thunder";
 
 const config: AstroProps = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
-  
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
+
   serverProps: {
     runtime: Cdk.aws_lambda.Runtime.NODEJS_22_X,
     architecture: Cdk.aws_lambda.Architecture.ARM_64,
     memorySize: 1024,
     timeout: 10,
     keepWarm: true,
-    variables: [{ NODE_ENV: 'production' }],
+    variables: [{ NODE_ENV: "production" }],
   },
-  
+
   // Optional: Custom domain
-  domain: 'myapp.com',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:...',
-  hostedZoneId: 'Z123456789',
+  domain: "myapp.com",
+  globalCertificateArn: "arn:aws:acm:us-east-1:...",
+  hostedZoneId: "Z123456789",
 };
 
-new Astro(new Cdk.App(), 'myapp-web-prod-stack', config);
+new Astro(new Cdk.App(), "myapp-web-prod-stack", config);
 ```
 
 #### SvelteKit
 
 **Example:**
+
 ```typescript
-import { Cdk, SvelteKit, type SvelteKitProps } from '@thunder-so/thunder';
+import { Cdk, SvelteKit, type SvelteKitProps } from "@thunder-so/thunder";
 
 const config: SvelteKitProps = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
-  
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
+
   serverProps: {
     runtime: Cdk.aws_lambda.Runtime.NODEJS_22_X,
     architecture: Cdk.aws_lambda.Architecture.ARM_64,
     memorySize: 1024,
     timeout: 10,
     keepWarm: true,
-    variables: [{ NODE_ENV: 'production' }],
+    variables: [{ NODE_ENV: "production" }],
   },
-  
+
   // Optional: Custom domain
-  domain: 'myapp.com',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:...',
-  hostedZoneId: 'Z123456789',
+  domain: "myapp.com",
+  globalCertificateArn: "arn:aws:acm:us-east-1:...",
+  hostedZoneId: "Z123456789",
 };
 
-new SvelteKit(new Cdk.App(), 'myapp-web-prod-stack', config);
+new SvelteKit(new Cdk.App(), "myapp-web-prod-stack", config);
 ```
 
 #### Solid Start
 
 **Example:**
+
 ```typescript
-import { Cdk, SolidStart, type SolidStartProps } from '@thunder-so/thunder';
+import { Cdk, SolidStart, type SolidStartProps } from "@thunder-so/thunder";
 
 const config: SolidStartProps = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
-  
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
+
   serverProps: {
     runtime: Cdk.aws_lambda.Runtime.NODEJS_22_X,
     architecture: Cdk.aws_lambda.Architecture.ARM_64,
     memorySize: 1024,
     timeout: 10,
     keepWarm: true,
-    variables: [{ NODE_ENV: 'production' }],
+    variables: [{ NODE_ENV: "production" }],
   },
-  
+
   // Optional: Custom domain
-  domain: 'myapp.com',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:...',
-  hostedZoneId: 'Z123456789',
+  domain: "myapp.com",
+  globalCertificateArn: "arn:aws:acm:us-east-1:...",
+  hostedZoneId: "Z123456789",
 };
 
-new SolidStart(new Cdk.App(), 'myapp-web-prod-stack', config);
+new SolidStart(new Cdk.App(), "myapp-web-prod-stack", config);
 ```
 
 #### AnalogJS
 
 **Example:**
+
 ```typescript
-import { Cdk, AnalogJS, type AnalogJSProps } from '@thunder-so/thunder';
+import { Cdk, AnalogJS, type AnalogJSProps } from "@thunder-so/thunder";
 
 const config: AnalogJSProps = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
-  
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
+
   serverProps: {
     runtime: Cdk.aws_lambda.Runtime.NODEJS_22_X,
     architecture: Cdk.aws_lambda.Architecture.ARM_64,
     memorySize: 1024,
     timeout: 10,
     keepWarm: true,
-    variables: [{ NODE_ENV: 'production' }],
+    variables: [{ NODE_ENV: "production" }],
   },
-  
+
   // Optional: Custom domain
-  domain: 'myapp.com',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:...',
-  hostedZoneId: 'Z123456789',
+  domain: "myapp.com",
+  globalCertificateArn: "arn:aws:acm:us-east-1:...",
+  hostedZoneId: "Z123456789",
 };
 
-new AnalogJS(new Cdk.App(), 'myapp-web-prod-stack', config);
+new AnalogJS(new Cdk.App(), "myapp-web-prod-stack", config);
 ```
 
 ---
@@ -489,38 +509,45 @@ Deploy [Coolify](https://coolify.io/)-style templates on EC2. Automatically fetc
 **AWS Resources:** Same as [EC2](#ec2)
 
 **Example:**
+
 ```typescript
-import { Cdk, Template, type TemplateProps, fetchTemplate, hydrateTemplate } from '@thunder-so/thunder';
-import { InstanceType, InstanceClass, InstanceSize } from 'aws-cdk-lib/aws-ec2';
+import {
+  Cdk,
+  Template,
+  type TemplateProps,
+  fetchTemplate,
+  hydrateTemplate,
+} from "@thunder-so/thunder";
+import { InstanceType, InstanceClass, InstanceSize } from "aws-cdk-lib/aws-ec2";
 
 async function main() {
   // Fetch template from Coolify repository
-  const { parsed: parsedTemplate, port } = await fetchTemplate('n8n');
-  
+  const { parsed: parsedTemplate, port } = await fetchTemplate("n8n");
+
   // Hydrate template with variables
   const hydrateResult = hydrateTemplate(parsedTemplate, {
-    domain: 'n8n.example.com',
+    domain: "n8n.example.com",
     fallbackPort: port,
   });
-  
+
   const config: TemplateProps = {
-    env: { account: '123456789012', region: 'us-east-1' },
-    application: 'myapp',
-    service: 'n8n',
-    environment: 'prod',
-    
-    templateSlug: 'n8n',
+    env: { account: "123456789012", region: "us-east-1" },
+    application: "myapp",
+    service: "n8n",
+    environment: "prod",
+
+    templateSlug: "n8n",
     instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MICRO),
-    authorizedKeys: ['ssh-rsa AAAAB3... user@example.com'],
+    authorizedKeys: ["ssh-rsa AAAAB3... user@example.com"],
     hydrateResult,
-    
+
     // Optional: Custom domain with SSL
-    domain: 'n8n.example.com',
-    hostedZoneId: 'Z123456789',
-    acmeEmail: 'admin@example.com',
+    domain: "n8n.example.com",
+    hostedZoneId: "Z123456789",
+    acmeEmail: "admin@example.com",
   };
-  
-  new Template(new Cdk.App(), 'myapp-n8n-prod-stack', config);
+
+  new Template(new Cdk.App(), "myapp-n8n-prod-stack", config);
 }
 
 main();
@@ -532,11 +559,11 @@ main();
 
 ## CLI Commands
 
-| Command | Description |
-| :--- | :--- |
-| `th init` | Scaffold a new project or service |
-| `th deploy` | Deploy stacks to AWS |
-| `th destroy` | Remove resources from AWS |
+| Command      | Description                       |
+| :----------- | :-------------------------------- |
+| `th init`    | Scaffold a new project or service |
+| `th deploy`  | Deploy stacks to AWS              |
+| `th destroy` | Remove resources from AWS         |
 
 ## Documentation
 
@@ -544,41 +571,43 @@ For detailed documentation on each construct and advanced configurations, see th
 
 ### Static
 
-| Guide | Description |
-| :--- | :--- |
-| [static-basic.md](./docs/static-basic.md) | Deploy a static site or SPA to S3 + CloudFront |
+| Guide                                                       | Description                                             |
+| :---------------------------------------------------------- | :------------------------------------------------------ |
+| [static-basic.md](./docs/static-basic.md)                   | Deploy a static site or SPA to S3 + CloudFront          |
 | [static-edge-functions.md](./docs/static-edge-functions.md) | Redirects, rewrites, and custom headers via Lambda@Edge |
-| [static-full.md](./docs/static-full.md) | Full `StaticProps` configuration reference |
+| [static-full.md](./docs/static-full.md)                     | Full `StaticProps` configuration reference              |
 
 ### Lambda
 
-| Guide | Description |
-| :--- | :--- |
-| [lambda-basic.md](./docs/lambda-basic.md) | Deploy a serverless API with Lambda + API Gateway |
-| [lambda-containers.md](./docs/lambda-containers.md) | Container images and Bun runtime |
-| [lambda-full.md](./docs/lambda-full.md) | Full `LambdaProps` configuration reference |
+| Guide                                               | Description                                       |
+| :-------------------------------------------------- | :------------------------------------------------ |
+| [lambda-basic.md](./docs/lambda-basic.md)           | Deploy a serverless API with Lambda + API Gateway |
+| [lambda-containers.md](./docs/lambda-containers.md) | Container images and Bun runtime                  |
+| [lambda-full.md](./docs/lambda-full.md)             | Full `LambdaProps` configuration reference        |
 
 ### Fargate
 
-| Guide | Description |
-| :--- | :--- |
-| [fargate-basic.md](./docs/fargate-basic.md) | Deploy a containerized service on ECS Fargate |
-| [fargate-nixpacks.md](./docs/fargate-nixpacks.md) | Auto-generate Dockerfiles with Nixpacks |
-| [fargate-full.md](./docs/fargate-full.md) | Full `FargateProps` configuration reference |
+| Guide                                             | Description                                   |
+| :------------------------------------------------ | :-------------------------------------------- |
+| [fargate-basic.md](./docs/fargate-basic.md)       | Deploy a containerized service on ECS Fargate |
+| [fargate-nixpacks.md](./docs/fargate-nixpacks.md) | Auto-generate Dockerfiles with Nixpacks       |
+| [fargate-full.md](./docs/fargate-full.md)         | Full `FargateProps` configuration reference   |
 
 ### Serverless (Full-Stack Frameworks)
 
-| Guide | Description |
-| :--- | :--- |
+| Guide                                 | Description                                |
+| :------------------------------------ | :----------------------------------------- |
 | [serverless.md](./docs/serverless.md) | Deploy full-stack meta-frameworks with SSR |
 
 ### Framework Guides
 
 **Static Deployment:**
+
 - [Next.js Static](./docs/frameworks/nextjs-static.md)
 - [Astro Static](./docs/frameworks/astro-static.md)
 
 **Serverless (Lambda + S3 + CloudFront):**
+
 - [Nuxt](./docs/frameworks/nuxt-serverless.md)
 - [Astro SSR](./docs/frameworks/astro-serverless.md)
 - [TanStack Start](./docs/frameworks/tanstack-start-serverless.md)
@@ -587,6 +616,7 @@ For detailed documentation on each construct and advanced configurations, see th
 - [AnalogJS](./docs/frameworks/analogjs-serverless.md)
 
 **Fargate (Containers):**
+
 - [Next.js with Dockerfile](./docs/frameworks/nextjs-fargate-dockerfile.md)
 - [Next.js with Nixpacks](./docs/frameworks/nextjs-fargate-nixpacks.md)
 - [Astro](./docs/frameworks/astro-fargate.md)

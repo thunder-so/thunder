@@ -42,17 +42,19 @@ export class Ec2Instance extends Construct {
     // ----------------------------------------------------------------
     // VPC — single public subnet, no NAT gateway needed
     // ----------------------------------------------------------------
-    const vpc = props.vpc || new Vpc(this, "Vpc", {
-      maxAzs: 1,
-      subnetConfiguration: [
-        {
-          name: "public",
-          subnetType: SubnetType.PUBLIC,
-          cidrMask: 24,
-        },
-      ],
-      natGateways: 0,
-    });
+    const vpc =
+      props.vpc ||
+      new Vpc(this, "Vpc", {
+        maxAzs: 1,
+        subnetConfiguration: [
+          {
+            name: "public",
+            subnetType: SubnetType.PUBLIC,
+            cidrMask: 24,
+          },
+        ],
+        natGateways: 0,
+      });
 
     // ----------------------------------------------------------------
     // Security group
@@ -67,32 +69,24 @@ export class Ec2Instance extends Construct {
     this.securityGroup.addIngressRule(
       Peer.anyIpv4(),
       Port.tcp(22),
-      "SSH access"
+      "SSH access",
     );
 
     // HTTP — Traefik redirect to HTTPS, or direct service access if no domain
-    this.securityGroup.addIngressRule(
-      Peer.anyIpv4(),
-      Port.tcp(80),
-      "HTTP"
-    );
+    this.securityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(80), "HTTP");
 
     // HTTPS — Traefik TLS termination
-    this.securityGroup.addIngressRule(
-      Peer.anyIpv4(),
-      Port.tcp(443),
-      "HTTPS"
-    );
+    this.securityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(443), "HTTPS");
 
     // Additional service ports
     if (props.extraPorts) {
       for (const port of props.extraPorts) {
         if ([22, 80, 443].includes(port)) continue;
-        
+
         this.securityGroup.addIngressRule(
           Peer.anyIpv4(),
           Port.tcp(port),
-          `Service port ${port}`
+          `Service port ${port}`,
         );
       }
     }
@@ -104,14 +98,10 @@ export class Ec2Instance extends Construct {
       assumedBy: new ServicePrincipal("ec2.amazonaws.com"),
       description: `${props.stackName} EC2 instance role`,
       managedPolicies: [
+        ManagedPolicy.fromAwsManagedPolicyName("AmazonSSMManagedInstanceCore"),
+        ManagedPolicy.fromAwsManagedPolicyName("CloudWatchAgentServerPolicy"),
         ManagedPolicy.fromAwsManagedPolicyName(
-          "AmazonSSMManagedInstanceCore"
-        ),
-        ManagedPolicy.fromAwsManagedPolicyName(
-          "CloudWatchAgentServerPolicy"
-        ),
-        ManagedPolicy.fromAwsManagedPolicyName(
-          "AmazonEC2ContainerRegistryReadOnly"
+          "AmazonEC2ContainerRegistryReadOnly",
         ),
       ],
     });
@@ -119,10 +109,11 @@ export class Ec2Instance extends Construct {
     // ----------------------------------------------------------------
     // AMI — latest Ubuntu 22.04 LTS
     // ----------------------------------------------------------------
-    const arch = props.architecture === CpuArchitecture.ARM64 ? "arm64" : "amd64";
+    const arch =
+      props.architecture === CpuArchitecture.ARM64 ? "arm64" : "amd64";
     const ami = MachineImage.fromSsmParameter(
       `/aws/service/canonical/ubuntu/server/22.04/stable/current/${arch}/hvm/ebs-gp2/ami-id`,
-      { os: OperatingSystemType.LINUX }
+      { os: OperatingSystemType.LINUX },
     );
 
     // ----------------------------------------------------------------

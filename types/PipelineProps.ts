@@ -1,16 +1,16 @@
 export interface SourceProps {
-    /**
-     * Optional. The GitHub repository owner.
-     */
-    readonly owner?: string;
-    /**
-     * Optional. The GitHub repository name.
-     */
-    readonly repo?: string;
-    /**
-     * Optional. The branch or ref to use. Defaults to 'main'.
-     */
-    readonly branchOrRef?: string;
+  /**
+   * Optional. The GitHub repository owner.
+   */
+  readonly owner?: string;
+  /**
+   * Optional. The GitHub repository name.
+   */
+  readonly repo?: string;
+  /**
+   * Optional. The branch or ref to use. Defaults to 'main'.
+   */
+  readonly branchOrRef?: string;
 }
 
 export interface PipelineWithRuntimeProps {
@@ -36,7 +36,7 @@ export interface PipelineWithRuntimeProps {
     /**
      * Optional. The runtime version. Defaults to '24'.
      */
-    readonly runtime_version?: string|number;
+    readonly runtime_version?: string | number;
     /**
      * Optional. The install command. Defaults to 'npm install'.
      */
@@ -60,12 +60,12 @@ export interface PipelineWithRuntimeProps {
     /**
      * Optional. Environment variables for the build.
      */
-    readonly environment?: Array<{ [key: string]: string; }>;
+    readonly environment?: Array<{ [key: string]: string }>;
     /**
      * Optional. Secrets from AWS Secrets Manager for the build.
      */
-    readonly secrets?: { key: string; resource: string; }[];
-    
+    readonly secrets?: { key: string; resource: string }[];
+
     /**
      * Optional. Path to a custom Dockerfile for the build environment.
      * Example: 'runtime/Dockerfile'
@@ -104,7 +104,7 @@ export interface PipelineWithBuildSystemProps {
     /**
      * Optional. Build system to use. Supports 'Nixpacks' or 'Custom Dockerfile'.
      */
-    readonly buildSystem?: 'Nixpacks' | 'Custom Dockerfile';
+    readonly buildSystem?: "Nixpacks" | "Custom Dockerfile";
     /**
      * Optional. Runtime name (e.g., nodejs, python). Defaults to 'nodejs'.
      */
@@ -140,11 +140,11 @@ export interface PipelineWithBuildSystemProps {
     /**
      * Optional. Environment variables for build.
      */
-    readonly environment?: Array<{ [key: string]: string; }>;
+    readonly environment?: Array<{ [key: string]: string }>;
     /**
      * Optional. Secrets for build (from Secrets Manager).
      */
-    readonly secrets?: { key: string; resource: string; }[];
+    readonly secrets?: { key: string; resource: string }[];
   };
 
   /**

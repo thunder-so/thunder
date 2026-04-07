@@ -1,12 +1,21 @@
-import { Construct } from 'constructs';
-import { Rule, EventBus } from 'aws-cdk-lib/aws-events';
-import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
-import { Role, ServicePrincipal, PolicyDocument, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam';
-import { RemovalPolicy } from 'aws-cdk-lib';
-import { Pipeline } from 'aws-cdk-lib/aws-codepipeline';
-import { CloudWatchLogGroup, EventBus as EventBusTarget } from 'aws-cdk-lib/aws-events-targets';
-import { getResourceIdPrefix } from '../utils';
-import { AppProps } from '../../types/AppProps';
+import { Construct } from "constructs";
+import { Rule, EventBus } from "aws-cdk-lib/aws-events";
+import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
+import {
+  Role,
+  ServicePrincipal,
+  PolicyDocument,
+  PolicyStatement,
+  Effect,
+} from "aws-cdk-lib/aws-iam";
+import { RemovalPolicy } from "aws-cdk-lib";
+import { Pipeline } from "aws-cdk-lib/aws-codepipeline";
+import {
+  CloudWatchLogGroup,
+  EventBus as EventBusTarget,
+} from "aws-cdk-lib/aws-events-targets";
+import { getResourceIdPrefix } from "../utils";
+import { AppProps } from "../../types/AppProps";
 
 export interface EventsProps extends AppProps {
   codePipeline: Pipeline;
@@ -19,34 +28,46 @@ export class EventsConstruct extends Construct {
 
     if (!props.eventTarget) return;
 
-    const resourceIdPrefix = getResourceIdPrefix(props.application, props.service, props.environment);
+    const resourceIdPrefix = getResourceIdPrefix(
+      props.application,
+      props.service,
+      props.environment,
+    );
 
     // Create a rule to capture execution events
-    const rule = new Rule(this, 'EventsRule', {
+    const rule = new Rule(this, "EventsRule", {
       ruleName: `${resourceIdPrefix}-events`,
       eventPattern: {
-        source: ['aws.codepipeline'],
-        detailType: ['CodePipeline Pipeline Execution State Change'],
+        source: ["aws.codepipeline"],
+        detailType: ["CodePipeline Pipeline Execution State Change"],
         detail: {
           pipeline: [props.codePipeline.pipelineName],
-          state: ["STARTED", "SUCCEEDED", "RESUMED", "FAILED", "CANCELED", "SUPERSEDED"],
+          state: [
+            "STARTED",
+            "SUCCEEDED",
+            "RESUMED",
+            "FAILED",
+            "CANCELED",
+            "SUPERSEDED",
+          ],
         },
-      }
+      },
     });
 
     if (props.debug) {
       // Create a CloudWatch Log Group for debugging
-      const logGroup = new LogGroup(this, 'EventsLogGroup', {
+      const logGroup = new LogGroup(this, "EventsLogGroup", {
         logGroupName: `/aws/events/${resourceIdPrefix}-pipeline`,
         removalPolicy: RemovalPolicy.DESTROY,
-        retention: RetentionDays.ONE_YEAR
+        retention: RetentionDays.ONE_YEAR,
       });
 
       // Create IAM role for log group
-      const logGroupEventRole = new Role(this, 'LogGroupEventRole', {
-        assumedBy: new ServicePrincipal('events.amazonaws.com'),
+      const logGroupEventRole = new Role(this, "LogGroupEventRole", {
+        assumedBy: new ServicePrincipal("events.amazonaws.com"),
         roleName: `${resourceIdPrefix}-LogGroupEventRole`,
-        description: 'Role for EventBridge to write pipeline events to CloudWatch Logs'
+        description:
+          "Role for EventBridge to write pipeline events to CloudWatch Logs",
       });
 
       // Grant the role permission to write to the log group
@@ -58,16 +79,17 @@ export class EventsConstruct extends Construct {
 
     if (props.eventTarget) {
       // Create IAM role for cross-account event bus access
-      const crossAccountEventRole = new Role(this, 'CrossAccountEventRole', {
-        assumedBy: new ServicePrincipal('events.amazonaws.com'),
+      const crossAccountEventRole = new Role(this, "CrossAccountEventRole", {
+        assumedBy: new ServicePrincipal("events.amazonaws.com"),
         roleName: `${resourceIdPrefix}-CrossAccountEventRole`,
-        description: 'Role for EventBridge to write pipeline events to external Event Bus',
+        description:
+          "Role for EventBridge to write pipeline events to external Event Bus",
         inlinePolicies: {
           AllowPutEvents: new PolicyDocument({
             statements: [
               new PolicyStatement({
                 effect: Effect.ALLOW,
-                actions: ['events:PutEvents'],
+                actions: ["events:PutEvents"],
                 resources: [props.eventTarget],
               }),
             ],
@@ -76,12 +98,17 @@ export class EventsConstruct extends Construct {
       });
 
       // add external event bus as target
-      const target = EventBus.fromEventBusArn(this, 'CrossAccountEventTarget', props.eventTarget);
+      const target = EventBus.fromEventBusArn(
+        this,
+        "CrossAccountEventTarget",
+        props.eventTarget,
+      );
 
-      rule.addTarget(new EventBusTarget(target, {
-        role: crossAccountEventRole
-      }));
+      rule.addTarget(
+        new EventBusTarget(target, {
+          role: crossAccountEventRole,
+        }),
+      );
     }
-
   }
 }

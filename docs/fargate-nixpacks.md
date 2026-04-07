@@ -9,6 +9,7 @@ Works with Node.js, Python, Go, Ruby, Rust, PHP, Java, Deno, and more.
 When `buildProps.buildSystem` is set to `'Nixpacks'`, Thunder runs the Nixpacks CLI during `cdk synth` to generate a `.nixpacks/Dockerfile` in your project root. That generated Dockerfile is then used as the container image for your Fargate task.
 
 The flow:
+
 1. `cdk deploy` triggers synth
 2. Thunder runs `nixpacks build --out .` in your `rootDir`
 3. Nixpacks detects your runtime (Node, Python, Go, etc.) and generates `.nixpacks/Dockerfile`
@@ -28,6 +29,7 @@ npm install -g nixpacks
 ```
 
 Verify:
+
 ```bash
 nixpacks --version
 ```
@@ -35,14 +37,14 @@ nixpacks --version
 ## Basic Example
 
 ```typescript
-import { Cdk, Fargate, type FargateProps } from '@thunder-so/thunder';
+import { Cdk, Fargate, type FargateProps } from "@thunder-so/thunder";
 
 const config: FargateProps = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'api',
-  environment: 'prod',
-  rootDir: '.',
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "api",
+  environment: "prod",
+  rootDir: ".",
 
   serviceProps: {
     port: 3000,
@@ -52,11 +54,11 @@ const config: FargateProps = {
   },
 
   buildProps: {
-    buildSystem: 'Nixpacks',
+    buildSystem: "Nixpacks",
   },
 };
 
-new Fargate(new Cdk.App(), 'myapp-api-prod-stack', config);
+new Fargate(new Cdk.App(), "myapp-api-prod-stack", config);
 ```
 
 ## Custom Commands
@@ -114,18 +116,19 @@ buildProps: {
 ## Full Example with Domain
 
 ```typescript
-import { Cdk, Fargate, type FargateProps } from '@thunder-so/thunder';
+import { Cdk, Fargate, type FargateProps } from "@thunder-so/thunder";
 
 const config: FargateProps = {
-  env: { account: '123456789012', region: 'us-east-1' },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
-  rootDir: '.',
+  env: { account: "123456789012", region: "us-east-1" },
+  application: "myapp",
+  service: "web",
+  environment: "prod",
+  rootDir: ".",
 
-  domain: 'app.example.com',
-  regionalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/abc-123',
-  hostedZoneId: 'Z1234567890ABC',
+  domain: "app.example.com",
+  regionalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+  hostedZoneId: "Z1234567890ABC",
 
   serviceProps: {
     architecture: Cdk.aws_ecs.CpuArchitecture.ARM64,
@@ -133,21 +136,25 @@ const config: FargateProps = {
     memorySize: 1024,
     port: 3000,
     desiredCount: 2,
-    healthCheckPath: '/health',
-    variables: [{ NODE_ENV: 'production' }],
+    healthCheckPath: "/health",
+    variables: [{ NODE_ENV: "production" }],
     secrets: [
-      { key: 'DATABASE_URL', resource: 'arn:aws:secretsmanager:us-east-1:123456789012:secret:/myapp/db-abc123' },
+      {
+        key: "DATABASE_URL",
+        resource:
+          "arn:aws:secretsmanager:us-east-1:123456789012:secret:/myapp/db-abc123",
+      },
     ],
   },
 
   buildProps: {
-    buildSystem: 'Nixpacks',
-    runtime_version: '22',
-    startcmd: 'node dist/server.js',
+    buildSystem: "Nixpacks",
+    runtime_version: "22",
+    startcmd: "node dist/server.js",
   },
 };
 
-new Fargate(new Cdk.App(), 'myapp-web-prod-stack', config);
+new Fargate(new Cdk.App(), "myapp-web-prod-stack", config);
 ```
 
 ## Supported Languages & Frameworks

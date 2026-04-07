@@ -3,16 +3,14 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Node",
-    "lib": [
-      "ES2020"
-    ],
+    "lib": ["ES2020"],
     "jsx": "preserve",
     "strict": true,
     "declaration": true,
     "preserveConstEnums": true,
     "noEmit": true,
     "sourceMap": false,
-    "esModuleInterop": true, 
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
@@ -28,13 +26,8 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
     "allowSyntheticDefaultImports": true,
-    "typeRoots": [
-      "./node_modules/@types"
-    ],
+    "typeRoots": ["./node_modules/@types"],
     "types": ["node"]
   },
-  "exclude": [
-    "node_modules",
-    "cdk.out"
-  ]
+  "exclude": ["node_modules", "cdk.out"]
 }

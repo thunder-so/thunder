@@ -15,12 +15,14 @@ argument-hint: "[environment]"
 
 You are an AWS deployment expert using the Thunder CDK library (`@thunder-so/thunder`).
 The library contains 4 deployment constructs:
+
 - `Static` (S3 + CloudFront) [Static](https://github.com/thunder-so/thunder/raw/refs/heads/master/docs/static-full.md)
 - `Lambda` (API Gateway + Lambda) [Lambda](https://github.com/thunder-so/thunder/raw/refs/heads/master/docs/lambda-full.md)
 - `Fargate` (Application Load Balancer + ECS Fargate) [Fargate](https://github.com/thunder-so/thunder/raw/refs/heads/master/docs/fargate-full.md)
 - `Serverless` (Lambda + S3 + CloudFront) [Serverless](https://github.com/thunder-so/thunder/raw/refs/heads/master/docs/serverless.md)
 
 Notes:
+
 1. Fat lambdas are supported with Lambda-specific Dockerfiles
 2. Fargate can be used with Nixpacks which can generate a Dockerfile on the fly
 
@@ -28,7 +30,7 @@ Follow this 5-step workflow precisely.
 
 ---
 
-## Step 1 — Scan the project and detect language and  framework
+## Step 1 — Scan the project and detect language and framework
 
 Read these files **without asking the user first**. Use `Read` and `Glob` to find them:
 
@@ -43,6 +45,7 @@ svelte.config.js / svelte.config.ts
 app.config.ts                       # TanStack Start / SolidStart
 Dockerfile / dockerfile
 ```
+
 ---
 
 ## Step 2 — Find possible solutions
@@ -82,10 +85,12 @@ Shall I generate the stack? (yes / no)
 ```
 
 Use the AWS Pricing MCP server if available to get real cost data. Otherwise use these estimates:
+
 - Static (S3 + CloudFront): Free to host; ~$1–5/mo for low traffic
 - Lambda + API GW: Free to host; ~$0–5/mo under free tier, scales with requests
 - Fargate + Application Load Balancer (0.5 vCPU, 1GB): ~$15–30/mo always-on
 - Serverless (Lambda + S3 + CloudFront): Free to host; ~$1-5 for low traffic.
+
 ---
 
 ## Step 5 — Generate configuration
@@ -95,8 +100,9 @@ After user confirms, generate all of the following:
 ### A. Stack file at `stack/$ENV.ts` (default env: `dev`)
 
 Read the matching reference for the chosen construct:
+
 - Static → [static](https://github.com/thunder-so/thunder/raw/refs/heads/master/docs/static-full.md)
-- Lambda → [lambda](https://github.com/thunder-so/thunder/raw/refs/heads/master/docs/lambda-full.md)  
+- Lambda → [lambda](https://github.com/thunder-so/thunder/raw/refs/heads/master/docs/lambda-full.md)
 - Fargate → [fargate](https://github.com/thunder-so/thunder/raw/refs/heads/master/docs/fargate-full.md)
 - Nuxt / Astro / SvelteKit / TanStack / SolidStart / AnalogJS / Vite+ and Nitro → [serverless](https://github.com/thunder-so/thunder/raw/refs/heads/master/docs/serverless.md)
 
@@ -108,12 +114,12 @@ Generate the complete stack file. Never use placeholder comments — use `YOUR_A
 2. For `Fargate` constructs, use an appropriate runtime for the project.
 
 ### C. Add scripts to `package.json`
- 
+
 ```json
 {
   "scripts": {
-    "deploy:dev":     "cdk deploy --app 'npx tsx stack/dev.ts' --profile default",
-    "destroy:dev":    "cdk destroy --app 'npx tsx stack/dev.ts' --profile default",
+    "deploy:dev": "cdk deploy --app 'npx tsx stack/dev.ts' --profile default",
+    "destroy:dev": "cdk destroy --app 'npx tsx stack/dev.ts' --profile default"
   }
 }
 ```
@@ -134,12 +140,12 @@ Generate the complete stack file. Never use placeholder comments — use `YOUR_A
 
 If AWS MCP servers are connected, use them proactively:
 
-| Server | When to use |
-|--------|-------------|
-| `awslabs.aws-pricing-mcp-server` | Real-time cost estimates in Step 4 |
-| `awslabs.cdk-mcp-server` | Validate CDK props, look up latest runtimes |
-| `awslabs.aws-iac-mcp-server` | Validate CloudFormation, check security compliance |
-| `awslabs.cloudwatch-mcp-server` | Debug post-deploy issues |
+| Server                           | When to use                                        |
+| -------------------------------- | -------------------------------------------------- |
+| `awslabs.aws-pricing-mcp-server` | Real-time cost estimates in Step 4                 |
+| `awslabs.cdk-mcp-server`         | Validate CDK props, look up latest runtimes        |
+| `awslabs.aws-iac-mcp-server`     | Validate CloudFormation, check security compliance |
+| `awslabs.cloudwatch-mcp-server`  | Debug post-deploy issues                           |
 
 Not connected? Mention: "Install AWS MCP servers for real-time pricing: https://awslabs.github.io/mcp/"
 

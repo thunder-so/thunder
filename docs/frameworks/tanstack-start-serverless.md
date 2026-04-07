@@ -18,14 +18,14 @@ TanStack Start uses [Nitro](https://nitro.unjs.io/) for server-side rendering. Y
 Edit `app.config.ts` (or create it if it doesn't exist):
 
 ```typescript
-import { defineConfig } from '@tanstack/start/config';
-import { nitro } from 'nitro/vite';
+import { defineConfig } from "@tanstack/start/config";
+import { nitro } from "nitro/vite";
 
 export default defineConfig({
   vite: {
     plugins: [
       nitro({
-        preset: 'aws-lambda',  // Required for Lambda deployment
+        preset: "aws-lambda", // Required for Lambda deployment
       }),
     ],
   },
@@ -35,13 +35,13 @@ export default defineConfig({
 **Alternative:** If using `@tanstack/nitro-v2-vite-plugin`:
 
 ```typescript
-import { nitroV2Plugin } from '@tanstack/nitro-v2-vite-plugin';
+import { nitroV2Plugin } from "@tanstack/nitro-v2-vite-plugin";
 
 export default defineConfig({
   vite: {
     plugins: [
       nitroV2Plugin({
-        preset: 'aws-lambda',
+        preset: "aws-lambda",
       }),
     ],
   },
@@ -57,6 +57,7 @@ bun run build
 ```
 
 This generates:
+
 - `.output/server/` - Lambda handler
 - `.output/public/` - Static assets for S3
 
@@ -71,24 +72,28 @@ bun add @thunder-so/thunder --development
 Create `stack/prod.ts`:
 
 ```typescript
-import { Cdk, TanStackStart, type TanStackStartProps } from '@thunder-so/thunder';
+import {
+  Cdk,
+  TanStackStart,
+  type TanStackStartProps,
+} from "@thunder-so/thunder";
 
 const config: TanStackStartProps = {
   env: {
-    account: '123456789012',  // Your AWS account ID
-    region: 'us-east-1',
+    account: "123456789012", // Your AWS account ID
+    region: "us-east-1",
   },
-  application: 'myapp',
-  service: 'web',
-  environment: 'prod',
+  application: "myapp",
+  service: "web",
+  environment: "prod",
 
-  rootDir: '.',
+  rootDir: ".",
 };
 
 new TanStackStart(
   new Cdk.App(),
   `${config.application}-${config.service}-${config.environment}-stack`,
-  config
+  config,
 );
 ```
 
@@ -117,10 +122,12 @@ Update your stack:
 ```typescript
 const config: TanStackStartProps = {
   // ...
-  domain: 'app.example.com',
-  hostedZoneId: 'Z1234567890ABC',
-  globalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/abc-123',
-  regionalCertificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/def-456',
+  domain: "app.example.com",
+  hostedZoneId: "Z1234567890ABC",
+  globalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/abc-123",
+  regionalCertificateArn:
+    "arn:aws:acm:us-east-1:123456789012:certificate/def-456",
 };
 ```
 
@@ -131,8 +138,8 @@ const config: TanStackStartProps = {
   // ...
   serverProps: {
     variables: [
-      { NODE_ENV: 'production' },
-      { API_BASE_URL: 'https://api.example.com' },
+      { NODE_ENV: "production" },
+      { API_BASE_URL: "https://api.example.com" },
     ],
   },
 };

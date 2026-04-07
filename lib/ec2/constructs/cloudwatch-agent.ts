@@ -85,7 +85,7 @@ export class CloudWatchAgent extends Construct {
         },
       },
       null,
-      2
+      2,
     );
   }
 }
