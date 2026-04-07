@@ -12,7 +12,7 @@ import { ServerlessPipeline } from "../lib/serverless/pipeline";
 import { MetadataConstruct } from "../lib/constructs/metadata";
 
 export interface ServerlessStackProps extends ServerlessProps {
-  framework: string;
+  framework?: string;
 }
 
 export class ServerlessStack extends Stack {
@@ -20,7 +20,7 @@ export class ServerlessStack extends Stack {
   constructor(scope: Construct, id: string, props: ServerlessStackProps) {
     super(scope, id, props);
 
-    const frameworkConfig = getFrameworkConfig(props.framework);
+    const frameworkConfig = getFrameworkConfig(props.framework ?? "generic");
     const mergedProps = mergePropsWithDefaults(props, frameworkConfig);
 
     const server = new ServerlessServer(this, "Server", mergedProps);
@@ -48,8 +48,9 @@ export class ServerlessStack extends Stack {
 
     new MetadataConstruct(this, "Metadata", {
       ...mergedProps,
-      stackType: props.framework,
+      stackType: "SERVERLESS",
       stackProps: {
+        framework: props.framework,
         serverProps: props.serverProps,
         domain: props.domain,
         globalCertificateArn: props.globalCertificateArn,

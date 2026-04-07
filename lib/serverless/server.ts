@@ -34,9 +34,7 @@ import {
 } from "../../types/ServerlessProps";
 import { getResourceIdPrefix } from "../utils";
 
-export interface ServerlessServerConstructProps extends ServerlessProps {
-  framework: string;
-}
+export interface ServerlessServerConstructProps extends ServerlessProps {}
 
 export class ServerlessServer extends Construct {
   private readonly resourceIdPrefix: string;

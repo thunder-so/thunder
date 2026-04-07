@@ -1,6 +1,15 @@
 import { FrameworkConfig, ServerlessProps } from "../../types/ServerlessProps";
 
 export const FRAMEWORK_CONFIGS: Record<string, FrameworkConfig> = {
+  generic: {
+    name: "Generic",
+    defaultServerDir: ".output/server",
+    defaultClientDir: ".output/public",
+    defaultHandler: "index.handler",
+    defaultServerPaths: ["/api/*"],
+    requiresFallbackEdge: false,
+    nitroPreset: "aws-lambda",
+  },
   nuxt: {
     name: "Nuxt",
     defaultServerDir: ".output/server",
@@ -67,9 +76,9 @@ export function getFrameworkConfig(framework: string): FrameworkConfig {
 }
 
 export function mergePropsWithDefaults(
-  props: ServerlessProps & { framework: string },
+  props: ServerlessProps & { framework?: string },
   config: FrameworkConfig,
-): ServerlessProps & { framework: string } {
+): ServerlessProps & { framework?: string } {
   return {
     ...props,
     serverProps: {

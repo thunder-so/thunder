@@ -61,7 +61,6 @@ import { getResourceIdPrefix } from "../utils";
 
 export interface ServerlessClientConstructProps extends ServerlessProps {
   httpOrigin: HttpOrigin;
-  framework: string;
 }
 
 export class ServerlessClient extends Construct {
@@ -310,7 +309,7 @@ export class ServerlessClient extends Construct {
       this,
       "ResponseHeadersPolicy",
       (props.responseHeadersPolicy ??
-        props.clientProps?.responseHeadersPolicy) || {
+        props.responseHeadersPolicy) || {
         comment: "ResponseHeadersPolicy" + Aws.STACK_NAME + "-" + Aws.REGION,
         securityHeadersBehavior: {
           contentSecurityPolicy: {
@@ -368,27 +367,27 @@ export class ServerlessClient extends Construct {
       defaultTtl: Duration.seconds(0),
       minTtl: Duration.seconds(0),
       maxTtl: Duration.seconds(1),
-      headerBehavior: (props.allowHeaders ?? props.clientProps?.allowHeaders)
+      headerBehavior: (props.allowHeaders)
         ?.length
         ? CacheHeaderBehavior.allowList(
-            ...(props.allowHeaders ?? props.clientProps!.allowHeaders)!,
+            ...(props.allowHeaders)!,
           )
         : CacheHeaderBehavior.none(),
-      cookieBehavior: (props.allowCookies ?? props.clientProps?.allowCookies)
+      cookieBehavior: (props.allowCookies)
         ?.length
         ? CacheCookieBehavior.allowList(
-            ...(props.allowCookies ?? props.clientProps!.allowCookies)!,
+            ...(props.allowCookies)!,
           )
         : CacheCookieBehavior.none(),
       queryStringBehavior: (
-        props.allowQueryParams ?? props.clientProps?.allowQueryParams
+        props.allowQueryParams
       )?.length
         ? CacheQueryStringBehavior.allowList(
-            ...(props.allowQueryParams ?? props.clientProps!.allowQueryParams)!,
+            ...(props.allowQueryParams)!,
           )
-        : (props.denyQueryParams ?? props.clientProps?.denyQueryParams)?.length
+        : (props.denyQueryParams)?.length
           ? CacheQueryStringBehavior.denyList(
-              ...(props.denyQueryParams ?? props.clientProps!.denyQueryParams)!,
+              ...(props.denyQueryParams)!,
             )
           : CacheQueryStringBehavior.none(),
       enableAcceptEncodingGzip: true,
