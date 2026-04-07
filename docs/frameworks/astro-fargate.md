@@ -30,11 +30,10 @@ export default defineConfig({
 ## 3. Create Dockerfile
 
 ```dockerfile
-FROM public.ecr.aws/docker/library/node:22-alpine AS builder
+FROM oven/bun:latest AS builder
 WORKDIR /app
 
 COPY package.json bun.lockb ./
-RUN corepack enable && corepack prepare bun@latest --activate
 RUN bun install --frozen-lockfile
 
 COPY . .
