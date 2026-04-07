@@ -42,9 +42,9 @@ export class ComputeConstruct extends Construct {
       sanitizePath(props.rootDir),
     );
 
-    // 2. Handle Nixpacks / Dockerfile
-    let dockerfilePath = props.serviceProps?.dockerFile || "Dockerfile";
-    if (props.buildProps?.buildSystem === "Nixpacks") {
+    // Use Nixpacks if no Dockerfile is specified
+    let dockerfilePath = props.serviceProps?.dockerFile;
+    if (!dockerfilePath) {
       dockerfilePath = generateNixpacksDockerfile(rootDir, props.buildProps);
     }
 

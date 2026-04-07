@@ -85,7 +85,7 @@ export interface PipelineWithRuntimeProps {
   readonly eventTarget?: string;
 }
 
-export interface PipelineWithBuildSystemProps {
+export interface PipelineWithBuildProps {
   /**
    * Enable pipeline mode with Github Access Token stored as a secret in SSM Secret Manager.
    * Provide the ARN to your Secrets Manager secret.
@@ -101,10 +101,6 @@ export interface PipelineWithBuildSystemProps {
    * Optional. The properties for CodeBuild build process.
    */
   readonly buildProps?: {
-    /**
-     * Optional. Build system to use. Supports 'Nixpacks' or 'Custom Dockerfile'.
-     */
-    readonly buildSystem?: "Nixpacks" | "Custom Dockerfile";
     /**
      * Optional. Runtime name (e.g., nodejs, python). Defaults to 'nodejs'.
      */

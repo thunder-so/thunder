@@ -62,7 +62,6 @@ const config: FargateProps = {
   },
 
   buildProps: {
-    buildSystem: "Nixpacks",
     runtime_version: "22",
     startcmd: "bun start",
   },

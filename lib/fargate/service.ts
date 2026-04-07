@@ -125,9 +125,9 @@ export class ServiceConstruct extends Construct {
       },
     });
 
-    // Nixpacks local Dockerfile generation
+    // Use Nixpacks if no Dockerfile is specified
     let dockerfilePath = props.serviceProps?.dockerFile;
-    if (props.buildProps?.buildSystem === "Nixpacks") {
+    if (!dockerfilePath) {
       dockerfilePath = generateNixpacksDockerfile(rootDir, props.buildProps);
     }
 

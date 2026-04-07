@@ -46,9 +46,8 @@ const config: FargateProps = {
     ],
   },
 
-  // Build System (Nixpacks alternative to Dockerfile)
+  // Build props (Nixpacks — used when no dockerFile is specified)
   // buildProps: {
-  //   buildSystem: 'Nixpacks',
   //   runtime_version: '22',
   //   installcmd: 'pnpm install',
   //   buildcmd: 'pnpm run build',
@@ -118,15 +117,16 @@ When all three are provided: HTTPS listener is added, HTTP redirects to HTTPS, a
 
 ### `buildProps` (Nixpacks)
 
-| Property          | Type                                  | Default | Description                                                                         |
-| ----------------- | ------------------------------------- | ------- | ----------------------------------------------------------------------------------- |
-| `buildSystem`     | `'Nixpacks'`                          | -       | Set to `'Nixpacks'` to auto-generate a Dockerfile. Requires Nixpacks CLI installed. |
-| `runtime_version` | `string \| number`                    | `24`    | Node.js version for Nixpacks (`NIXPACKS_NODE_VERSION`)                              |
-| `installcmd`      | `string`                              | auto    | Override install command                                                            |
-| `buildcmd`        | `string`                              | auto    | Override build command                                                              |
-| `startcmd`        | `string`                              | auto    | Override start command                                                              |
-| `environment`     | `Array<{ [key: string]: string }>`    | -       | Build-time environment variables                                                    |
-| `secrets`         | `{ key: string; resource: string }[]` | -       | Build-time secrets from Secrets Manager                                             |
+Nixpacks is used automatically when no `dockerFile` is set in `serviceProps`.
+
+| Property          | Type                                  | Default | Description                                            |
+| ----------------- | ------------------------------------- | ------- | ------------------------------------------------------ |
+| `runtime_version` | `string \| number`                    | `24`    | Node.js version for Nixpacks (`NIXPACKS_NODE_VERSION`) |
+| `installcmd`      | `string`                              | auto    | Override install command                               |
+| `buildcmd`        | `string`                              | auto    | Override build command                                 |
+| `startcmd`        | `string`                              | auto    | Override start command                                 |
+| `environment`     | `Array<{ [key: string]: string }>`    | -       | Build-time environment variables                       |
+| `secrets`         | `{ key: string; resource: string }[]` | -       | Build-time secrets from Secrets Manager                |
 
 ### VPC
 

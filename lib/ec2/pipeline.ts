@@ -90,7 +90,7 @@ export class PipelineConstruct extends Construct {
   private createBuildProject(props: Ec2Props): PipelineProject {
     let buildCommands: string[];
     let dockerfilePath = props.serviceProps?.dockerFile || "Dockerfile";
-    if (props.buildProps?.buildSystem === "Nixpacks") {
+    if (!props.serviceProps?.dockerFile) {
       const installCmd = props.buildProps?.installcmd
         ? `--install-cmd "${props.buildProps.installcmd}"`
         : "";

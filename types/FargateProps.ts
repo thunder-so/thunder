@@ -1,5 +1,5 @@
 import { AppProps } from "./AppProps";
-import { PipelineWithBuildSystemProps } from "./PipelineProps";
+import { PipelineWithBuildProps } from "./PipelineProps";
 import { CpuArchitecture } from "aws-cdk-lib/aws-ecs";
 import { VpcLinkProps } from "./VpcProps";
 
@@ -73,7 +73,7 @@ interface FargateDomainProps {
 
 export interface FargateProps
   extends
-    PipelineWithBuildSystemProps,
+    PipelineWithBuildProps,
     FargateDomainProps,
     AppProps,
     VpcLinkProps {

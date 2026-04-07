@@ -6,7 +6,7 @@ Works with Node.js, Python, Go, Ruby, Rust, PHP, Java, Deno, and more.
 
 ## How It Works
 
-When `buildProps.buildSystem` is set to `'Nixpacks'`, Thunder runs the Nixpacks CLI during `cdk synth` to generate a `.nixpacks/Dockerfile` in your project root. That generated Dockerfile is then used as the container image for your Fargate task.
+When no `dockerFile` is specified in `serviceProps`, Thunder automatically runs the Nixpacks CLI during `cdk synth` to generate a `.nixpacks/Dockerfile` in your project root. That generated Dockerfile is then used as the container image for your Fargate task.
 
 The flow:
 
@@ -52,10 +52,6 @@ const config: FargateProps = {
     memorySize: 1024,
     desiredCount: 1,
   },
-
-  buildProps: {
-    buildSystem: "Nixpacks",
-  },
 };
 
 new Fargate(new Cdk.App(), "myapp-api-prod-stack", config);
@@ -67,7 +63,6 @@ Override Nixpacks' auto-detected commands:
 
 ```typescript
 buildProps: {
-  buildSystem: 'Nixpacks',
   installcmd: 'pnpm install',
   buildcmd: 'pnpm run build',
   startcmd: 'pnpm start',
@@ -82,7 +77,6 @@ Control the Node.js version via `runtime_version`:
 
 ```typescript
 buildProps: {
-  buildSystem: 'Nixpacks',
   runtime_version: '22',  // sets NIXPACKS_NODE_VERSION
 },
 ```
@@ -93,7 +87,6 @@ Pass environment variables into the Nixpacks build:
 
 ```typescript
 buildProps: {
-  buildSystem: 'Nixpacks',
   environment: [
     { VITE_API_URL: 'https://api.example.com' },
   ],
@@ -106,7 +99,6 @@ Inject secrets from AWS Secrets Manager into the build environment:
 
 ```typescript
 buildProps: {
-  buildSystem: 'Nixpacks',
   secrets: [
     { key: 'NPM_TOKEN', resource: 'arn:aws:secretsmanager:us-east-1:123456789012:secret:/myapp/NPM_TOKEN-abc123' },
   ],
@@ -148,7 +140,6 @@ const config: FargateProps = {
   },
 
   buildProps: {
-    buildSystem: "Nixpacks",
     runtime_version: "22",
     startcmd: "node dist/server.js",
   },

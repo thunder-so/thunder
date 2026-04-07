@@ -123,7 +123,7 @@ export class PipelineConstruct extends Construct {
     // BuildSpec for Docker build & push using image digest and date-based tag
     let buildCommands: string[];
     let dockerfilePath = props.serviceProps?.dockerFile || "Dockerfile";
-    if (props.buildProps?.buildSystem === "Nixpacks") {
+    if (!props.serviceProps?.dockerFile) {
       // Nixpacks integration
       const installCmd = props.buildProps?.installcmd
         ? `--install-cmd "${props.buildProps.installcmd}"`

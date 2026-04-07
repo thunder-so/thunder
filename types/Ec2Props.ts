@@ -1,5 +1,5 @@
 import { AppProps } from "./AppProps";
-import { PipelineWithBuildSystemProps } from "./PipelineProps";
+import { PipelineWithBuildProps } from "./PipelineProps";
 import { CpuArchitecture } from "aws-cdk-lib/aws-ecs";
 import { VpcLinkProps } from "./VpcProps";
 
@@ -61,6 +61,6 @@ interface Ec2DomainProps {
 }
 
 export interface Ec2Props
-  extends PipelineWithBuildSystemProps, Ec2DomainProps, AppProps, VpcLinkProps {
+  extends PipelineWithBuildProps, Ec2DomainProps, AppProps, VpcLinkProps {
   readonly serviceProps?: Ec2ServiceProps;
 }
