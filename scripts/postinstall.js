@@ -9,10 +9,11 @@
  * Location: .claude/skills/<skill-name>/SKILL.md (project-level skill)
  */
 
-"use strict";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const fs = require("fs");
-const path = require("path");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SKILL_NAME = "aws-deploy";
 const SKILL_SRC = path.join(__dirname, "..", ".claude", "skills", SKILL_NAME);
