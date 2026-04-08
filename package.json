@@ -15,13 +15,18 @@
     "serverless",
     "container",
     "typescript",
-    "infrastructure-as-code"
+    "infrastructure-as-code",
+    "tanstack-intent"
   ],
   "type": "module",
   "main": "index.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/thunder-so/thunder.git"
+  },
+  "intent": {
+    "source": "https://github.com/thunder-so/thunder.git",
+    "docs": "https://github.com/thunder-so/thunder/tree/main/docs"
   },
   "author": {
     "name": "CloudBits, Inc.",
@@ -32,12 +37,15 @@
   "scripts": {
     "cdk": "cdk",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "node scripts/postinstall.js"
+    "intent:validate": "intent validate",
+    "intent:stale": "intent stale",
+    "intent:ship": "intent edit-package-json"
   },
   "bin": {
     "th": "cli/th.mjs"
   },
   "devDependencies": {
+    "@tanstack/intent": "^0.0.29",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "24.9.1",
     "@types/shelljs": "^0.8.15",
@@ -58,5 +66,9 @@
     "shelljs": "^0.10.0",
     "source-map-support": "^0.5.21",
     "yaml": "^2.8.1"
-  }
+  },
+  "files": [
+    "skills",
+    "!skills/_artifacts"
+  ]
 }
