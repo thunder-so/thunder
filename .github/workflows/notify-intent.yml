@@ -16,9 +16,10 @@ name: Trigger Skill Review
 
 on:
   push:
-    branches: [main]
-    paths:      - 'https://github.com/thunder-so/thunder/tree/main/docs/**'
-      - 'packages/thunder/src/**'
+    branches: [master]
+    paths:
+      - "docs/**"
+      - "skills/**"
 
 jobs:
   notify:

@@ -140,4 +140,4 @@ jobs:
           PREOF
           )" \
             --head "$BRANCH" \
-            --base main
+            --base master
