@@ -4,7 +4,7 @@ import { HostingConstruct } from "../lib/static/hosting";
 import { PipelineConstruct } from "../lib/static/pipeline";
 import { DeployConstruct } from "../lib/static/deploy";
 import { MetadataConstruct } from "../lib/constructs/metadata";
-import { StaticProps } from "../types/StaticProps";
+import { StaticProps } from "../types";
 
 export class Static extends Stack {
   constructor(scope: Construct, id: string, props: StaticProps) {
@@ -47,17 +47,8 @@ export class Static extends Stack {
 
     // 4. Metadata
     new MetadataConstruct(this, "Metadata", {
-      ...props,
+      context: { metadata: props },
       stackType: "STATIC",
-      stackProps: {
-        outputDir: props.outputDir,
-        domain: props.domain,
-        globalCertificateArn: props.globalCertificateArn,
-        hostedZoneId: props.hostedZoneId,
-        redirects: props.redirects,
-        rewrites: props.rewrites,
-        headers: props.headers,
-      },
       resources: {
         DistributionId: hosting.distribution.distributionId,
         DistributionUrl: `https://${hosting.distribution.distributionDomainName}`,

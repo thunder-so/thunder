@@ -56,7 +56,7 @@ import {
   ServerlessProps,
   ServerlessClientProps,
   ServerlessServerProps,
-} from "../../types/ServerlessProps";
+} from "../../types";
 import { getResourceIdPrefix } from "../utils";
 
 export interface ServerlessClientConstructProps extends ServerlessProps {

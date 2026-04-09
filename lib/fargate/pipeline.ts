@@ -19,7 +19,7 @@ import {
 } from "aws-cdk-lib/aws-codepipeline-actions";
 import { Repository } from "aws-cdk-lib/aws-ecr";
 import { FargateService, TaskDefinition } from "aws-cdk-lib/aws-ecs";
-import { FargateProps } from "../../types/FargateProps";
+import { FargateProps } from "../../types";
 import { getResourceIdPrefix } from "../utils";
 import { EventsConstruct } from "../constructs/events";
 

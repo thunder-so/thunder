@@ -19,7 +19,7 @@ import {
   CodeBuildActionType,
 } from "aws-cdk-lib/aws-codepipeline-actions";
 import { Repository } from "aws-cdk-lib/aws-ecr";
-import { Ec2Props } from "../../types/Ec2Props";
+import { Ec2Props } from "../../types";
 import { getResourceIdPrefix } from "../utils";
 import { EventsConstruct } from "../constructs/events";
 

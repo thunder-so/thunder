@@ -13,5 +13,5 @@ export { ServerlessClient } from "../client";
 export { ServerlessPipeline } from "../pipeline";
 
 // Types and utilities
-export * from "../../../types/ServerlessProps";
+export * from "../../../types";
 export * from "../../../lib/utils/framework-config";

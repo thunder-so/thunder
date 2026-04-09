@@ -38,7 +38,7 @@ import {
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { Rule, Schedule, RuleTargetInput } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
-import { LambdaProps } from "../../types/LambdaProps";
+import { LambdaProps } from "../../types";
 import { getResourceIdPrefix, resolveVpc } from "../utils";
 
 export interface FunctionConstructProps extends LambdaProps {

@@ -1,6 +1,6 @@
 import { Construct } from "constructs";
 import { Vpc, SubnetType, IpAddresses, IVpc } from "aws-cdk-lib/aws-ec2";
-import { VPCProps } from "../../types/VpcProps";
+import { VPCProps } from "../../types";
 import { IVpcLink } from "../utils/vpc";
 
 export interface VpcConstructProps extends VPCProps {

@@ -1,5 +1,5 @@
 import { ServerlessStack } from "../../../stacks/ServerlessStack";
-import { ServerlessProps } from "../../../types/ServerlessProps";
+import { ServerlessProps } from "../../../types";
 
 export class Astro extends ServerlessStack {
   constructor(scope: any, id: string, props: ServerlessProps) {

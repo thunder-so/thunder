@@ -8,7 +8,7 @@ import {
 } from "aws-cdk-lib/aws-s3-deployment";
 import { type IBucket } from "aws-cdk-lib/aws-s3";
 import { IDistribution } from "aws-cdk-lib/aws-cloudfront";
-import { StaticProps } from "../../types/StaticProps";
+import { StaticProps } from "../../types";
 
 export interface DeployProps extends StaticProps {
   HostingBucket: IBucket;

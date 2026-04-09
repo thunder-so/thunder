@@ -3,8 +3,7 @@ import { IVpc } from "aws-cdk-lib/aws-ec2";
 import { Construct } from "constructs";
 import { VPC } from "../lib/constructs/vpc";
 import { MetadataConstruct } from "../lib/constructs/metadata";
-import { AppProps } from "../types/AppProps";
-import { VPCProps } from "../types/VpcProps";
+import { AppProps, VPCProps } from "../types";
 import { IVpcLink } from "../lib/utils/vpc";
 import { getResourceIdPrefix } from "../lib/utils";
 
@@ -48,9 +47,8 @@ export class Vpc extends Stack implements IVpcLink {
 
     // 2. Metadata
     new MetadataConstruct(this, "Metadata", {
-      ...props,
+      context: { metadata: props },
       stackType: "VPC",
-      stackProps: {},
       resources: {
         VpcId: this.vpc.vpcId,
         PublicSubnets: this.vpc.publicSubnets.map((s) => s.subnetId),

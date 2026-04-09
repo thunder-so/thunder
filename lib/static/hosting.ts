@@ -47,7 +47,7 @@ import {
 import { CloudFrontTarget } from "aws-cdk-lib/aws-route53-targets";
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 import { Runtime, Code } from "aws-cdk-lib/aws-lambda";
-import { StaticProps } from "../../types/StaticProps";
+import { StaticProps } from "../../types";
 import { getResourceIdPrefix } from "../utils";
 
 export class HostingConstruct extends Construct {

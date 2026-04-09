@@ -1,7 +1,7 @@
 import { Stack } from "aws-cdk-lib";
 import { IRole } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
-import { ServerlessProps } from "../types/ServerlessProps";
+import { ServerlessProps } from "../types";
 import {
   getFrameworkConfig,
   mergePropsWithDefaults,
@@ -47,16 +47,8 @@ export class ServerlessStack extends Stack {
     }
 
     new MetadataConstruct(this, "Metadata", {
-      ...mergedProps,
+      context: { metadata: mergedProps },
       stackType: "SERVERLESS",
-      stackProps: {
-        framework: props.framework,
-        serverProps: props.serverProps,
-        domain: props.domain,
-        globalCertificateArn: props.globalCertificateArn,
-        regionalCertificateArn: props.regionalCertificateArn,
-        hostedZoneId: props.hostedZoneId,
-      },
       resources: {
         DistributionId: client.cdn.distributionId,
         DistributionUrl: `https://${client.cdn.distributionDomainName}`,

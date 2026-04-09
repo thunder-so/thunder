@@ -1,4 +1,4 @@
-import { FrameworkConfig, ServerlessProps } from "../../types/ServerlessProps";
+import { FrameworkConfig, ServerlessProps } from "../../types";
 
 export const FRAMEWORK_CONFIGS: Record<string, FrameworkConfig> = {
   generic: {

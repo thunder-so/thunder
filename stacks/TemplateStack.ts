@@ -2,7 +2,7 @@ import { Stack, CfnOutput, Aws } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { TemplateConstruct } from "../lib/template";
 import { MetadataConstruct } from "../lib/constructs/metadata";
-import { TemplateProps } from "../types/TemplateProps";
+import { TemplateProps } from "../types";
 
 export class Template extends Stack {
   constructor(scope: Construct, id: string, props: TemplateProps) {
@@ -38,17 +38,8 @@ export class Template extends Stack {
 
     // 2. Metadata
     new MetadataConstruct(this, "Metadata", {
-      ...props,
+      context: { metadata: props },
       stackType: "TEMPLATE",
-      stackProps: {
-        templateSlug: props.templateSlug,
-        instanceType: props.instanceType,
-        authorizedKeys: props.authorizedKeys,
-        hydrateResult: props.hydrateResult,
-        domain: props.domain,
-        hostedZoneId: props.hostedZoneId,
-        acmeEmail: props.acmeEmail,
-      },
       resources: {
         TemplateSlug: props.templateSlug,
         InstanceId: template.instance.instance.instanceId,

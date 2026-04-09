@@ -32,7 +32,7 @@ import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
 import { HostedZone, ARecord, RecordTarget } from "aws-cdk-lib/aws-route53";
 import { LoadBalancerTarget } from "aws-cdk-lib/aws-route53-targets";
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
-import { FargateProps } from "../../types/FargateProps";
+import { FargateProps } from "../../types";
 import {
   getResourceIdPrefix,
   generateNixpacksDockerfile,

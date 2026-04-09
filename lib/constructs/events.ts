@@ -15,7 +15,7 @@ import {
   EventBus as EventBusTarget,
 } from "aws-cdk-lib/aws-events-targets";
 import { getResourceIdPrefix } from "../utils";
-import { AppProps } from "../../types/AppProps";
+import { AppProps } from "../../types";
 
 export interface EventsProps extends AppProps {
   codePipeline: Pipeline;

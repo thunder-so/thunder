@@ -27,7 +27,7 @@ import {
 } from "aws-cdk-lib/aws-lambda";
 import { Repository } from "aws-cdk-lib/aws-ecr";
 import { Distribution } from "aws-cdk-lib/aws-cloudfront";
-import { ServerlessProps } from "../../types/ServerlessProps";
+import { ServerlessProps } from "../../types";
 import { getResourceIdPrefix } from "../utils";
 import { EventsConstruct } from "../constructs/events";
 

@@ -3,7 +3,7 @@ import { Construct } from "constructs";
 import { DockerImageAsset, Platform } from "aws-cdk-lib/aws-ecr-assets";
 import { InstanceType } from "aws-cdk-lib/aws-ec2";
 import { CpuArchitecture } from "aws-cdk-lib/aws-ecs";
-import { Ec2Props } from "../../types/Ec2Props";
+import { Ec2Props } from "../../types";
 import {
   generateNixpacksDockerfile,
   getResourceIdPrefix,

@@ -31,7 +31,7 @@ import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import {
   ServerlessProps,
   ServerlessServerProps,
-} from "../../types/ServerlessProps";
+} from "../../types";
 import { getResourceIdPrefix } from "../utils";
 
 export interface ServerlessServerConstructProps extends ServerlessProps {}

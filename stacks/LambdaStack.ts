@@ -4,7 +4,7 @@ import { Repository } from "aws-cdk-lib/aws-ecr";
 import { FunctionsConstruct } from "../lib/lambda/functions";
 import { PipelineConstruct } from "../lib/lambda/pipeline";
 import { MetadataConstruct } from "../lib/constructs/metadata";
-import { LambdaProps } from "../types/LambdaProps";
+import { LambdaProps } from "../types";
 import { getResourceIdPrefix } from "../lib/utils";
 
 export class Lambda extends Stack {
@@ -70,14 +70,8 @@ export class Lambda extends Stack {
 
     // Metadata
     new MetadataConstruct(this, "Metadata", {
-      ...props,
+      context: { metadata: props },
       stackType: "LAMBDA",
-      stackProps: {
-        functionProps: props.functionProps,
-        domain: props.domain,
-        regionalCertificateArn: props.regionalCertificateArn,
-        hostedZoneId: props.hostedZoneId,
-      },
       resources: {
         LambdaFunction: lambda.lambdaFunction.functionName,
         LambdaFunctionArn: lambda.lambdaFunction.functionArn,

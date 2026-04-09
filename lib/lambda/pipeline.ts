@@ -29,7 +29,7 @@ import {
 } from "aws-cdk-lib/aws-lambda";
 import { DockerImageAsset } from "aws-cdk-lib/aws-ecr-assets";
 import { Repository } from "aws-cdk-lib/aws-ecr";
-import { LambdaProps } from "../../types/LambdaProps";
+import { LambdaProps } from "../../types";
 import { getResourceIdPrefix } from "../utils";
 import { EventsConstruct } from "../constructs/events";
 

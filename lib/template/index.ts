@@ -5,7 +5,7 @@ import { InstanceType, InstanceClass, InstanceSize } from "aws-cdk-lib/aws-ec2";
 import { CloudWatchAgent } from "./constructs/cloudwatch-agent";
 import { Ec2Instance } from "./constructs/ec2-instance";
 import { buildUserData } from "./constructs/user-data";
-import { TemplateProps } from "../../types/TemplateProps";
+import { TemplateProps } from "../../types";
 import { getResourceIdPrefix, resolveVpc } from "../utils";
 
 export class TemplateConstruct extends Construct {

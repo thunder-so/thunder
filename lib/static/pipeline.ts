@@ -40,7 +40,7 @@ import {
 } from "aws-cdk-lib/aws-codepipeline-actions";
 import { IDistribution } from "aws-cdk-lib/aws-cloudfront";
 import { DockerImageAsset } from "aws-cdk-lib/aws-ecr-assets";
-import { StaticProps } from "../../types/StaticProps";
+import { StaticProps } from "../../types";
 import { getResourceIdPrefix } from "../utils";
 import { EventsConstruct } from "../constructs/events";
 

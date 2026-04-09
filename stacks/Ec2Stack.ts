@@ -4,7 +4,7 @@ import { ARecord, HostedZone, RecordTarget } from "aws-cdk-lib/aws-route53";
 import { ComputeConstruct } from "../lib/ec2/compute";
 import { PipelineConstruct } from "../lib/ec2/pipeline";
 import { MetadataConstruct } from "../lib/constructs/metadata";
-import { Ec2Props } from "../types/Ec2Props";
+import { Ec2Props } from "../types";
 import { getResourceIdPrefix } from "../lib/utils";
 
 export class Ec2 extends Stack {
@@ -115,14 +115,8 @@ export class Ec2 extends Stack {
 
     // 5. Metadata
     new MetadataConstruct(this, "Metadata", {
-      ...props,
+      context: { metadata: props },
       stackType: "EC2",
-      stackProps: {
-        serviceProps: props.serviceProps,
-        domain: props.domain,
-        hostedZoneId: props.hostedZoneId,
-        acmeEmail: props.acmeEmail,
-      },
       resources: {
         InstanceId: ec2.instance.instance.instanceId,
         ElasticIp: ec2.instance.elasticIp.ref,

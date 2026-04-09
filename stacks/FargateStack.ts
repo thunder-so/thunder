@@ -3,7 +3,7 @@ import { Construct } from "constructs";
 import { ServiceConstruct } from "../lib/fargate/service";
 import { PipelineConstruct } from "../lib/fargate/pipeline";
 import { MetadataConstruct } from "../lib/constructs/metadata";
-import { FargateProps } from "../types/FargateProps";
+import { FargateProps } from "../types";
 import { getResourceIdPrefix } from "../lib/utils";
 
 export class Fargate extends Stack {
@@ -60,14 +60,8 @@ export class Fargate extends Stack {
 
     // Metadata
     new MetadataConstruct(this, "Metadata", {
-      ...props,
+      context: { metadata: props },
       stackType: "FARGATE",
-      stackProps: {
-        serviceProps: props.serviceProps,
-        domain: props.domain,
-        globalCertificateArn: props.globalCertificateArn,
-        hostedZoneId: props.hostedZoneId,
-      },
       resources: {
         LoadBalancerDNS: fargate.loadBalancerDnsName,
         ServiceUrl: props.domain

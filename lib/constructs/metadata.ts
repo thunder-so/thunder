@@ -8,28 +8,23 @@ import {
   PhysicalResourceId,
 } from "aws-cdk-lib/custom-resources";
 import { createRequire } from "module";
-import { AppProps } from "../../types/AppProps";
-import { SourceProps } from "../../types/PipelineProps";
+import type { ContextProps } from "../../types";
 
 const require = createRequire(import.meta.url);
 const { version: STACK_VERSION } = require("../../package.json");
 
-export interface MetadataProps extends AppProps {
+export interface MetadataProps {
+  readonly context: ContextProps;
   readonly stackType: string;
-  readonly stackProps?: Record<string, any>;
   readonly resources: Record<string, any>;
-  readonly sourceProps?: SourceProps;
-  readonly buildProps?: Record<string, any>;
-  readonly accessTokenSecretArn?: string;
-  readonly eventTarget?: string;
 }
 
 export class MetadataConstruct extends Construct {
   constructor(scope: Construct, id: string, props: MetadataProps) {
     super(scope, id);
 
-    const account = props.env?.account || Aws.ACCOUNT_ID;
-    const region = props.env?.region || Aws.REGION;
+    const account = props.context.metadata.env?.account || Aws.ACCOUNT_ID;
+    const region = props.context.metadata.env?.region || Aws.REGION;
     const bucketName = `thunder-metadata-${account}-${region}`;
 
     const bucketChecker = new AwsCustomResource(this, "BucketChecker", {
@@ -59,28 +54,8 @@ export class MetadataConstruct extends Construct {
       bucketName,
     );
 
-    // Context metadata content (for context.json)
-    const contextMetadata = {
-      debug: props.debug || false,
-      rootDir: props.rootDir || "/",
-      ...(props.stackProps || {}),
-      sourceProps: props.sourceProps,
-      buildProps: props.buildProps,
-      env: {
-        region: region,
-        account: account,
-      },
-      application: props.application,
-      service: props.service,
-      environment: props.environment,
-      accessTokenSecretArn: props.accessTokenSecretArn,
-      eventTarget: props.eventTarget,
-      contextDirectory: props.contextDirectory,
-    };
-
-    const contextContent = {
-      metadata: contextMetadata,
-    };
+    // Store context as-is
+    const contextContent = props.context;
 
     // Metadata content (for metadata.json)
     const metadataContent = {
@@ -90,7 +65,7 @@ export class MetadataConstruct extends Construct {
       created_at: new Date().toISOString(),
     };
 
-    const destinationPrefix = `apps/${props.application}/${props.environment}/${props.service}`;
+    const destinationPrefix = `apps/${props.context.metadata.application}/${props.context.metadata.environment}/${props.context.metadata.service}`;
 
     const deployment = new BucketDeployment(this, "Metadata", {
       sources: [
