@@ -5,6 +5,7 @@ import {
   resolveEnv,
   mapLambdaRuntime,
   mapLambdaArch,
+  getResourceIdPrefix,
 } from "./utils";
 
 const app = new App();
@@ -26,7 +27,7 @@ const metadata: NuxtProps = {
 
 new Nuxt(
   app,
-  `${metadata.application}-${metadata.service}-${metadata.environment}-stack`,
+  `${getResourceIdPrefix(metadata.application, metadata.service, metadata.environment)}-stack`,
   metadata,
 );
 app.synth();

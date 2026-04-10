@@ -1,6 +1,11 @@
 import { App } from "aws-cdk-lib";
 import { Ec2, type Ec2Props } from "../";
-import { getMetadata, resolveEnv, mapFargateArch } from "./utils";
+import {
+  getMetadata,
+  resolveEnv,
+  mapFargateArch,
+  getResourceIdPrefix,
+} from "./utils";
 
 const app = new App();
 const raw = getMetadata(app);
@@ -18,7 +23,7 @@ const metadata: Ec2Props = {
 
 new Ec2(
   app,
-  `${metadata.application}-${metadata.service}-${metadata.environment}-stack`,
+  `${getResourceIdPrefix(metadata.application, metadata.service, metadata.environment)}-stack`,
   metadata,
 );
 app.synth();

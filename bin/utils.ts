@@ -2,6 +2,8 @@ import { Runtime, Architecture } from "aws-cdk-lib/aws-lambda";
 import { CpuArchitecture } from "aws-cdk-lib/aws-ecs";
 import { App, Aws } from "aws-cdk-lib";
 
+export { getResourceIdPrefix } from "../lib/utils/naming";
+
 export function mapLambdaRuntime(rt?: string | Runtime): Runtime | undefined {
   if (!rt) return undefined;
   if ((rt as any)?.name) return rt as Runtime;

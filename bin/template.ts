@@ -6,6 +6,7 @@ import {
   fetchTemplate,
   hydrateTemplate,
 } from "../";
+import { getResourceIdPrefix } from "./utils";
 
 const app = new App();
 
@@ -59,7 +60,7 @@ async function main() {
 
   new Template(
     app,
-    `${config.application}-${config.service}-${config.environment}-stack`,
+    `${getResourceIdPrefix(metadata.application, metadata.service, metadata.environment)}-stack`,
     metadata,
   );
 

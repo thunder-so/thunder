@@ -1,4 +1,4 @@
-import { Aws } from "aws-cdk-lib";
+import { Aws, Stack } from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { Bucket } from "aws-cdk-lib/aws-s3";
 import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
@@ -59,6 +59,7 @@ export class MetadataConstruct extends Construct {
 
     // Metadata content (for metadata.json)
     const metadataContent = {
+      stack_name: Stack.of(this).stackName,
       stack_type: props.stackType,
       stack_version: STACK_VERSION,
       resources: props.resources,
