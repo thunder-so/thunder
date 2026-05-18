@@ -68,7 +68,13 @@
     "yaml": "^2.8.1"
   },
   "files": [
+    "bin",
+    "cli",
+    "lib",
+    "runtime",
     "skills",
-    "!skills/_artifacts"
+    "stacks",
+    "types",
+    "index.ts"
   ]
 }

@@ -11,6 +11,4 @@ test
 .github
 .vscode
 .idea
-*.ts
-!*.d.ts
 .agents
