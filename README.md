@@ -7,7 +7,7 @@
 
 Build full-stack apps on your own AWS.
 
-Thunder is a CDK library and CLI for deploying modern web applications on AWS. One library to rule them all: [Static SPAs](#static), [Lambda Functions](#lambda), [Containers on Fargate](#fargate) and [EC2](#ec2), and [Serverless Full-stack Frameworks](#serverless-frameworks).
+Thunder is a CDK library for deploying modern web applications on AWS. One library to rule them all: [Static SPAs](#static), [Lambda Functions](#lambda), [Containers on Fargate](#fargate) and [EC2](#ec2), and [Serverless Full-stack Frameworks](#serverless-frameworks).
 
 ## Table of Contents
 
@@ -19,14 +19,12 @@ Thunder is a CDK library and CLI for deploying modern web applications on AWS. O
   - [Lambda](#lambda) - API Gateway + Lambda
   - [Fargate](#fargate) - ECS Fargate + ALB + CloudFront
   - [Serverless Frameworks](#serverless-frameworks) - Full-stack meta-frameworks with Lambda + S3 + CloudFront
-- [CLI Commands](#cli-commands)
 - [Documentation](#documentation)
 - [License](#license)
 
 ## Features
 
 - **Constructs:** One-line deployment for `Static`, `Lambda`, `Fargate`, `EC2`, `Serverless`, and framework-specific constructs.
-- **Thunder CLI (`th`):** Context-aware CLI for initializing, deploying, and managing your infrastructure.
 - **VPC Link Pattern:** Easily connect your compute resources to a shared VPC.
 - **High-Performance Serving:** Pre-configured [CloudFront](https://aws.amazon.com/cloudfront/) distributions with OAC, security headers, and edge optimizations.
 - **Built-in CI/CD:** Optional [AWS CodePipeline](https://aws.amazon.com/codepipeline/) integration with GitHub support.
@@ -46,13 +44,7 @@ Thunder is a CDK library and CLI for deploying modern web applications on AWS. O
 bun add @thunder-so/thunder --development
 ```
 
-### 2. Initialize
-
-```bash
-npx th init
-```
-
-### 3. Configure
+### 2. Configure
 
 Create a stack file (e.g., `stack/dev.ts`):
 
@@ -79,7 +71,7 @@ new Static(
 );
 ```
 
-### 4. Deploy
+### 3. Deploy
 
 ```bash
 npx cdk deploy --app "npx tsx stack/dev.ts" --profile default
@@ -497,14 +489,6 @@ new AnalogJS(new Cdk.App(), "myapp-web-prod-stack", config);
 ```
 
 ---
-
-## CLI Commands
-
-| Command      | Description                       |
-| :----------- | :-------------------------------- |
-| `th init`    | Scaffold a new project or service |
-| `th deploy`  | Deploy stacks to AWS              |
-| `th destroy` | Remove resources from AWS         |
 
 ## Documentation
 

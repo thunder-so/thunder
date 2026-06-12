@@ -42,36 +42,27 @@
     "intent:stale": "intent stale",
     "intent:ship": "intent edit-package-json"
   },
-  "bin": {
-    "th": "cli/th.mjs"
-  },
+
   "devDependencies": {
-    "@tanstack/intent": "^0.0.29",
+    "@tanstack/intent": "^0.0.42",
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "24.9.1",
-    "@types/shelljs": "^0.8.15",
-    "aws-cdk": "2.1023.0",
-    "prettier": "^3.8.1",
+    "@types/node": "25.9.3",
+    "aws-cdk": "2.1126.0",
+    "prettier": "^3.8.4",
     "ts-node": "^10.9.2",
-    "tsx": "^4.20.6",
-    "typescript": "~5.9.3",
-    "vitest": "^4.1.7"
+    "tsx": "^4.22.4",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.8"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.221.0",
-    "chalk": "^5.4.0",
-    "commander": "^13.0.0",
-    "constructs": "^10.4.2",
-    "fs-extra": "^11.3.2",
-    "inquirer": "^12.3.0",
-    "ora": "^8.2.0",
-    "shelljs": "^0.10.0",
+    "aws-cdk-lib": "2.259.0",
+    "constructs": "^10.6.0",
+    "fs-extra": "^11.3.5",
     "source-map-support": "^0.5.21",
-    "yaml": "^2.8.1"
+    "yaml": "^2.9.0"
   },
   "files": [
     "bin",
-    "cli",
     "lib",
     "runtime",
     "skills",
