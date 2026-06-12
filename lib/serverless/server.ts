@@ -164,7 +164,7 @@ export class ServerlessServer extends Construct {
         : Duration.seconds(10),
       memorySize: props.serverProps?.memorySize || 1792,
       logGroup: new LogGroup(this, "ServerFunctionLogGroup", {
-        logGroupName: `${this.resourceIdPrefix}-function-logs`,
+        logGroupName: `/aws/lambda/${this.resourceIdPrefix}-container-function`,
         retention: RetentionDays.ONE_MONTH,
       }),
       allowPublicSubnet: false,
@@ -201,7 +201,7 @@ export class ServerlessServer extends Construct {
         : Duration.seconds(10),
       memorySize: props.serverProps?.memorySize || 1792,
       logGroup: new LogGroup(this, "LambdaFunctionLogGroup", {
-        logGroupName: `${this.resourceIdPrefix}-function-logs`,
+        logGroupName: `/aws/lambda/${this.resourceIdPrefix}-function`,
         retention: RetentionDays.ONE_MONTH,
       }),
       allowPublicSubnet: false,

@@ -59,6 +59,7 @@ export class PipelineConstruct extends Construct {
   private buildId: string;
   public buildOutputBucket: IBucket;
   private customRuntimeImageUri?: string;
+  private customRuntimeRepositoryArn?: string;
   private rootDir: string;
   private outputDir: string;
 
@@ -94,6 +95,7 @@ export class PipelineConstruct extends Construct {
       enforceSSL: true,
       removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
+      lifecycleRules: [{ expiration: Duration.days(30) }],
     });
 
     // create custom runtime if enabled
@@ -106,6 +108,7 @@ export class PipelineConstruct extends Construct {
         },
       });
       this.customRuntimeImageUri = dockerAsset.imageUri;
+      this.customRuntimeRepositoryArn = dockerAsset.repository.repositoryArn;
     }
 
     // create build project
@@ -388,7 +391,13 @@ export class PipelineConstruct extends Construct {
       new PolicyStatement({
         effect: Effect.ALLOW,
         actions: ["ssm:GetParameters"],
-        resources: ["arn:aws:ssm:*:*:parameter/*"],
+        resources:
+          props.buildProps?.secrets && props.buildProps.secrets.length > 0
+            ? props.buildProps.secrets.map(
+                ({ resource }) =>
+                  `arn:aws:ssm:${props.env?.region ?? "*"}:${props.env?.account ?? "*"}:parameter/${resource.replace(/^\//, "")}`,
+              )
+            : [`arn:aws:ssm:${props.env?.region ?? "*"}:${props.env?.account ?? "*"}:parameter/NONE`],
       }),
     );
 
@@ -413,13 +422,19 @@ export class PipelineConstruct extends Construct {
       project.addToRolePolicy(
         new PolicyStatement({
           effect: Effect.ALLOW,
+          actions: ["ecr:GetAuthorizationToken"],
+          resources: ["*"],
+        }),
+      );
+      project.addToRolePolicy(
+        new PolicyStatement({
+          effect: Effect.ALLOW,
           actions: [
-            "ecr:GetAuthorizationToken",
             "ecr:BatchCheckLayerAvailability",
             "ecr:GetDownloadUrlForLayer",
             "ecr:BatchGetImage",
           ],
-          resources: ["*"],
+          resources: [this.customRuntimeRepositoryArn!],
         }),
       );
     }
@@ -459,6 +474,7 @@ export class PipelineConstruct extends Construct {
       enforceSSL: true,
       removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
+      lifecycleRules: [{ expiration: Duration.days(30) }],
     });
 
     // setup the pipeline

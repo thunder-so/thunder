@@ -43,6 +43,7 @@ export class PipelineConstruct extends Construct {
   private codeBuildProject: PipelineProject;
   public codePipeline: Pipeline;
   private customRuntimeImageUri?: string;
+  private customRuntimeRepositoryArn?: string;
   private rootDir: string;
   private codeDir: string;
 
@@ -78,6 +79,7 @@ export class PipelineConstruct extends Construct {
         },
       });
       this.customRuntimeImageUri = dockerAsset.imageUri;
+      this.customRuntimeRepositoryArn = dockerAsset.repository.repositoryArn;
     }
 
     if (isContainerBuild) {
@@ -112,14 +114,15 @@ export class PipelineConstruct extends Construct {
   private createContainerPipeline(props: LambdaPipelineProps): Pipeline {
     // Artifact Buckets
     const artifactBucket = new Bucket(this, "PipelineArtifactsBucket", {
-      bucketName: `${this.resourceIdPrefix}-pipeline-artifacts`,
-      encryption: BucketEncryption.S3_MANAGED,
-      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      objectOwnership: ObjectOwnership.OBJECT_WRITER,
-      enforceSSL: true,
-      removalPolicy: RemovalPolicy.DESTROY,
-      autoDeleteObjects: true,
-    });
+          bucketName: `${this.resourceIdPrefix}-pipeline-artifacts`,
+          encryption: BucketEncryption.S3_MANAGED,
+          blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+          objectOwnership: ObjectOwnership.OBJECT_WRITER,
+          enforceSSL: true,
+          removalPolicy: RemovalPolicy.DESTROY,
+          autoDeleteObjects: true,
+          lifecycleRules: [{ expiration: Duration.days(30) }],
+        });
 
     // Artifacts
     const sourceOutput = new Artifact("SourceOutput");
@@ -225,13 +228,19 @@ export class PipelineConstruct extends Construct {
       dockerBuildProject.addToRolePolicy(
         new PolicyStatement({
           effect: Effect.ALLOW,
+          actions: ["ecr:GetAuthorizationToken"],
+          resources: ["*"],
+        }),
+      );
+      dockerBuildProject.addToRolePolicy(
+        new PolicyStatement({
+          effect: Effect.ALLOW,
           actions: [
-            "ecr:GetAuthorizationToken",
             "ecr:BatchCheckLayerAvailability",
             "ecr:GetDownloadUrlForLayer",
             "ecr:BatchGetImage",
           ],
-          resources: ["*"],
+          resources: [this.customRuntimeRepositoryArn!],
         }),
       );
     }
@@ -464,13 +473,19 @@ export class PipelineConstruct extends Construct {
       buildProject.addToRolePolicy(
         new PolicyStatement({
           effect: Effect.ALLOW,
+          actions: ["ecr:GetAuthorizationToken"],
+          resources: ["*"],
+        }),
+      );
+      buildProject.addToRolePolicy(
+        new PolicyStatement({
+          effect: Effect.ALLOW,
           actions: [
-            "ecr:GetAuthorizationToken",
             "ecr:BatchCheckLayerAvailability",
             "ecr:GetDownloadUrlForLayer",
             "ecr:BatchGetImage",
           ],
-          resources: ["*"],
+          resources: [this.customRuntimeRepositoryArn!],
         }),
       );
     }
@@ -486,14 +501,15 @@ export class PipelineConstruct extends Construct {
   private createPipeline(props: LambdaPipelineProps): Pipeline {
     // Artifact Buckets
     const artifactBucket = new Bucket(this, "PipelineArtifactsBucket", {
-      bucketName: `${this.resourceIdPrefix}-pipeline-artifacts`,
-      encryption: BucketEncryption.S3_MANAGED,
-      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      objectOwnership: ObjectOwnership.OBJECT_WRITER,
-      enforceSSL: true,
-      removalPolicy: RemovalPolicy.DESTROY,
-      autoDeleteObjects: true,
-    });
+          bucketName: `${this.resourceIdPrefix}-pipeline-artifacts`,
+          encryption: BucketEncryption.S3_MANAGED,
+          blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+          objectOwnership: ObjectOwnership.OBJECT_WRITER,
+          enforceSSL: true,
+          removalPolicy: RemovalPolicy.DESTROY,
+          autoDeleteObjects: true,
+          lifecycleRules: [{ expiration: Duration.days(30) }],
+        });
 
     // Artifacts
     const sourceOutput = new Artifact("SourceOutput");

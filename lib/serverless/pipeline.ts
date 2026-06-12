@@ -68,6 +68,7 @@ export class ServerlessPipeline extends Construct {
       enforceSSL: true,
       removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
+      lifecycleRules: [{ expiration: Duration.days(30) }],
     });
 
     const sourceOutput = new Artifact("SourceOutput");

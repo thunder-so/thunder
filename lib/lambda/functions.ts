@@ -283,7 +283,7 @@ export class FunctionsConstruct extends Construct {
             "ecr:DescribeImages",
             "ecr:DescribeRepositories",
           ],
-          resources: ["*"], // Allow access to any ECR repository for flexibility
+          resources: [props.repository.repositoryArn],
         }),
       );
     }

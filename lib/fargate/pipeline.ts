@@ -97,15 +97,26 @@ export class PipelineConstruct extends Construct {
     props.taskDefinition?.executionRole?.addToPrincipalPolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
+        actions: ["ecr:GetAuthorizationToken"],
+        resources: ["*"], // GetAuthorizationToken requires * resource
+      }),
+    );
+    props.taskDefinition?.executionRole?.addToPrincipalPolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
         actions: [
-          "ecr:GetAuthorizationToken",
           "ecr:BatchCheckLayerAvailability",
           "ecr:GetDownloadUrlForLayer",
           "ecr:BatchGetImage",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
         ],
-        resources: ["*"],
+        resources: [repo.repositoryArn],
+      }),
+    );
+    props.taskDefinition?.executionRole?.addToPrincipalPolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: ["logs:CreateLogStream", "logs:PutLogEvents"],
+        resources: [`arn:aws:logs:*:*:log-group:/webservice/${this.resourceIdPrefix}-*`],
       }),
     );
 

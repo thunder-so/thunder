@@ -368,7 +368,7 @@ export class HostingConstruct extends Construct {
       "RedirectRewriteFunction",
       {
         code: Code.fromInline(functionCode),
-        runtime: Runtime.NODEJS_18_X,
+        runtime: Runtime.NODEJS_20_X,
         handler: "index.handler",
         role: this.lambdaEdgeRole,
       },
@@ -431,7 +431,7 @@ export class HostingConstruct extends Construct {
       "HeadersFunction",
       {
         code: Code.fromInline(functionCode),
-        runtime: Runtime.NODEJS_18_X,
+        runtime: Runtime.NODEJS_20_X,
         handler: "index.handler",
         role: this.lambdaEdgeRole,
       },
