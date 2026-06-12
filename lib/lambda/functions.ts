@@ -16,6 +16,7 @@ import {
   DockerImageCode,
   DockerImageFunction,
   LayerVersion,
+  LambdaInsightsVersion,
 } from "aws-cdk-lib/aws-lambda";
 import { Repository } from "aws-cdk-lib/aws-ecr";
 import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
@@ -251,6 +252,9 @@ export class FunctionsConstruct extends Construct {
       allowPublicSubnet: false,
       vpc: vpc,
       tracing: props.functionProps?.tracing ? Tracing.ACTIVE : Tracing.DISABLED,
+      insightsVersion: props.functionProps?.insights
+        ? LambdaInsightsVersion.VERSION_1_0_404_0
+        : undefined,
       environment: {
         NODE_OPTIONS: "--enable-source-maps",
         NITRO_PRESET: "aws-lambda",
@@ -337,6 +341,9 @@ export class FunctionsConstruct extends Construct {
       logGroup: functionLogGroup,
       vpc: vpc,
       tracing: props.functionProps?.tracing ? Tracing.ACTIVE : Tracing.DISABLED,
+      insightsVersion: props.functionProps?.insights
+        ? LambdaInsightsVersion.VERSION_1_0_404_0
+        : undefined,
       environment: {
         NODE_OPTIONS: "--enable-source-maps",
         NITRO_PRESET: "aws-lambda",

@@ -48,6 +48,11 @@ interface LambdaFunctionProps {
    */
   readonly tracing?: boolean;
   /**
+   * Enable Lambda Insights for system-level metrics (memory, CPU, cold starts).
+   * Attaches the CloudWatch Lambda Insights extension layer.
+   */
+  readonly insights?: boolean;
+  /**
    * Reserved concurrency
    */
   readonly reservedConcurrency?: number;

@@ -34,6 +34,11 @@ export interface ServerlessServerProps {
   paths?: string[];
   keepWarm?: boolean;
   tracing?: boolean;
+  /**
+   * Enable Lambda Insights for system-level metrics (memory, CPU, cold starts).
+   * Attaches the CloudWatch Lambda Insights extension layer.
+   */
+  insights?: boolean;
   streaming?: boolean;
 }
 

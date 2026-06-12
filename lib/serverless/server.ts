@@ -13,6 +13,7 @@ import {
   DockerImageCode,
   DockerImageFunction,
   Alias,
+  LambdaInsightsVersion,
 } from "aws-cdk-lib/aws-lambda";
 import {
   HttpApi,
@@ -169,6 +170,9 @@ export class ServerlessServer extends Construct {
       }),
       allowPublicSubnet: false,
       tracing: props.serverProps?.tracing ? Tracing.ACTIVE : Tracing.DISABLED,
+      insightsVersion: props.serverProps?.insights
+        ? LambdaInsightsVersion.VERSION_1_0_404_0
+        : undefined,
       environment: {
         NODE_OPTIONS: "--enable-source-maps",
         NITRO_PRESET: "aws-lambda",
@@ -206,6 +210,9 @@ export class ServerlessServer extends Construct {
       }),
       allowPublicSubnet: false,
       tracing: props.serverProps?.tracing ? Tracing.ACTIVE : Tracing.DISABLED,
+      insightsVersion: props.serverProps?.insights
+        ? LambdaInsightsVersion.VERSION_1_0_404_0
+        : undefined,
       environment: {
         NODE_OPTIONS: "--enable-source-maps",
         NITRO_PRESET: "aws-lambda",
